@@ -70,6 +70,26 @@ const App = () => {
       embedUrl: 'https://www.youtube.com/embed/ykKewCjcfy8?start=125'
     }
   ];
+
+  const showcaseItems = [
+    {
+      title: 'Advanced Trainers',
+      description: 'Sophisticated training tools for popular AAA titles',
+      image: 'https://images.unsplash.com/photo-1656662961786-b04873ceb4b9',
+      stats: '50K+ Downloads'
+    },
+    {
+      title: 'Script Collection',
+      description: 'Comprehensive automation and enhancement scripts',
+      image: 'https://images.unsplash.com/photo-1612404475557-369522ece36f',
+      stats: '25K+ Active Users'
+    },
+    {
+      title: 'Custom Solutions',
+      description: 'Bespoke modifications tailored to your needs',
+      image: 'https://images.pexels.com/photos/8728559/pexels-photo-8728559.jpeg',
+      stats: '100% Satisfaction'
+    }
   ];
 
   return (
@@ -227,24 +247,58 @@ const App = () => {
             </p>
           </div>
           <div className="showcase-grid">
-            {videos.map((video, index) => (
+            {showcaseItems.map((item, index) => (
               <div key={index} className="showcase-card">
-                <div className="showcase-video">
+                <div className="showcase-image">
+                  <img src={item.image} alt={item.title} />
+                  <div className="showcase-overlay">
+                    <div className="showcase-stats">{item.stats}</div>
+                  </div>
+                </div>
+                <div className="showcase-content">
+                  <h3 className="showcase-title">{item.title}</h3>
+                  <p className="showcase-description">{item.description}</p>
+                  <button className="showcase-button">
+                    Download Now
+                    <span className="download-icon">⬇️</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Videos Section */}
+      <section id="videos" className="videos">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Video Tutorials</h2>
+            <p className="section-subtitle">
+              Watch step-by-step guides and showcases of our game modifications
+            </p>
+          </div>
+          <div className="videos-grid">
+            {videos.map((video, index) => (
+              <div key={index} className="video-card">
+                <div className="video-wrapper">
                   <iframe
                     src={video.embedUrl}
                     title={video.title}
+                    frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                    className="video-iframe"
                   ></iframe>
                 </div>
-                <div className="showcase-content">
-                  <h3 className="showcase-title">{video.title}</h3>
-                  <p className="showcase-description">{video.description}</p>
+                <div className="video-content">
+                  <h3 className="video-title">{video.title}</h3>
+                  <p className="video-description">{video.description}</p>
                   <a
                     href={`https://www.youtube.com/watch?v=${video.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="showcase-button"
+                    className="video-button"
                   >
                     Watch on YouTube
                     <span className="youtube-icon">📺</span>
