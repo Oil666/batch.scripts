@@ -710,6 +710,10 @@ const App = () => {
 
       {/* Services Section */}
       <section id="services" className="services">
+        <div className="services-background">
+          <img src="https://images.unsplash.com/photo-1603732551681-2e91159b9dc2" alt="Circuit Board Background" className="services-bg-image" />
+          <div className="services-overlay"></div>
+        </div>
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Our Expertise</h2>
