@@ -38,7 +38,38 @@ const App = () => {
     }
   ];
 
-  const showcaseItems = [
+  const videos = [
+    {
+      id: 'VnVoTmgRM_E',
+      title: 'Game Mod Tutorial',
+      description: 'Learn how to install and use advanced game modifications',
+      embedUrl: 'https://www.youtube.com/embed/VnVoTmgRM_E'
+    },
+    {
+      id: 'pEuEVMzQWFA',
+      title: 'Script Development Guide',
+      description: 'Step-by-step guide to creating custom game scripts',
+      embedUrl: 'https://www.youtube.com/embed/pEuEVMzQWFA'
+    },
+    {
+      id: 'YGso8N62hz8',
+      title: 'Advanced Training Tools',
+      description: 'Showcase of sophisticated game training utilities',
+      embedUrl: 'https://www.youtube.com/embed/YGso8N62hz8?start=194'
+    },
+    {
+      id: 'agIAFSkPMuA',
+      title: 'Custom Trainer Creation',
+      description: 'Behind-the-scenes look at trainer development process',
+      embedUrl: 'https://www.youtube.com/embed/agIAFSkPMuA?start=16'
+    },
+    {
+      id: 'ykKewCjcfy8',
+      title: 'Mod Installation Tutorial',
+      description: 'Complete guide to safely installing game modifications',
+      embedUrl: 'https://www.youtube.com/embed/ykKewCjcfy8?start=125'
+    }
+  ];
     {
       title: 'Advanced Trainers',
       description: 'Sophisticated training tools for popular AAA titles',
