@@ -288,6 +288,20 @@ const App = () => {
             >
               🔑 Quick Fill Credentials
             </button>
+            
+            <button 
+              type="button" 
+              className="instant-login-btn"
+              onClick={() => {
+                setIsAdminLoggedIn(true);
+                setShowAdminLogin(false);
+                setShowAdminPanel(true);
+                setLoginError('');
+                localStorage.setItem('pandaAdminSession', 'true');
+              }}
+            >
+              ⚡ Instant Admin Access
+            </button>
           </div>
         </form>
         
