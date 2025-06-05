@@ -1077,9 +1077,13 @@ body {
 .quick-login {
   margin-top: 1rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.quick-login-btn {
+.quick-login-btn,
+.instant-login-btn {
   background: rgba(0, 212, 255, 0.2);
   border: 1px solid rgba(0, 212, 255, 0.4);
   border-radius: 8px;
@@ -1090,9 +1094,20 @@ body {
   font-size: 0.9rem;
 }
 
-.quick-login-btn:hover {
+.instant-login-btn {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #10b981;
+}
+
+.quick-login-btn:hover,
+.instant-login-btn:hover {
   background: rgba(0, 212, 255, 0.3);
   transform: translateY(-2px);
+}
+
+.instant-login-btn:hover {
+  background: rgba(16, 185, 129, 0.3);
 }
 
 .admin-content {
