@@ -274,6 +274,9 @@ const App = () => {
               <h3 className="footer-title">𝓟𝓐𝓝𝓓𝓐_𝓜𝓞𝓓𝓩</h3>
               <p className="footer-tagline">Elevating gaming experiences, one mod at a time.</p>
               <div className="footer-social">
+                <a href="https://www.youtube.com/@DarkPandax" target="_blank" rel="noopener noreferrer" className="social-link">
+                  <span>📺</span> YouTube
+                </a>
                 <a href="https://discord.com/invite/sYT5UXkv7F" target="_blank" rel="noopener noreferrer" className="social-link">
                   <span>💬</span> Discord
                 </a>
