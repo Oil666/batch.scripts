@@ -249,8 +249,8 @@ const App = () => {
             <label>Username:</label>
             <input
               type="text"
-              value={adminCredentials.username}
-              onChange={(e) => setAdminCredentials({...adminCredentials, username: e.target.value})}
+              value={loginUsername}
+              onChange={(e) => setLoginUsername(e.target.value)}
               placeholder="Enter admin username"
               required
               autoComplete="username"
@@ -261,15 +261,15 @@ const App = () => {
             <label>Password:</label>
             <input
               type="password"
-              value={adminCredentials.password}
-              onChange={(e) => setAdminCredentials({...adminCredentials, password: e.target.value})}
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
               placeholder="Enter admin password"
               required
               autoComplete="current-password"
             />
           </div>
           
-          {adminError && <div className="admin-error">{adminError}</div>}
+          {loginError && <div className="admin-error">{loginError}</div>}
           
           <button type="submit" className="admin-login-btn">🚀 Access Admin Panel</button>
           
@@ -278,7 +278,8 @@ const App = () => {
               type="button" 
               className="quick-login-btn"
               onClick={() => {
-                setAdminCredentials({ username: 'admin', password: 'pandamodz2024' });
+                setLoginUsername('admin');
+                setLoginPassword('pandamodz2024');
               }}
             >
               🔑 Quick Fill Credentials
