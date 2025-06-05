@@ -700,89 +700,190 @@ const App = () => {
   const AdminPanel = () => {
     const renderTabContent = () => {
       switch(activeAdminTab) {
+  // Enhanced admin data with real-time updates
+  const [adminData, setAdminData] = useState({
+    totalVisitors: 15847,
+    todayVisitors: 324,
+    totalDownloads: 89452,
+    activeUsers: 1847,
+    serverStatus: 'online',
+    cpuUsage: 34,
+    memoryUsage: 67,
+    storageUsage: 45,
+    uptime: '7d 14h 23m',
+    lastBackup: '2 hours ago',
+    version: 'v2.1.0'
+  });
+
+  // Real-time data simulation
+  useEffect(() => {
+    if (isAdminLoggedIn && showAdminPanel) {
+      const interval = setInterval(() => {
+        setAdminData(prev => ({
+          ...prev,
+          cpuUsage: Math.max(15, Math.min(85, prev.cpuUsage + (Math.random() - 0.5) * 10)),
+          memoryUsage: Math.max(40, Math.min(90, prev.memoryUsage + (Math.random() - 0.5) * 8)),
+          storageUsage: Math.max(30, Math.min(95, prev.storageUsage + (Math.random() - 0.5) * 5)),
+          activeUsers: Math.max(1500, Math.min(2500, prev.activeUsers + Math.floor((Math.random() - 0.5) * 20))),
+          todayVisitors: prev.todayVisitors + Math.floor(Math.random() * 3)
+        }));
+      }, 3000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isAdminLoggedIn, showAdminPanel]);
+
+  // Enhanced notification system
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: 'success', message: 'System backup completed successfully', time: '2 min ago' },
+    { id: 2, type: 'info', message: 'New user registered from Discord', time: '5 min ago' },
+    { id: 3, type: 'warning', message: 'High memory usage detected', time: '12 min ago' }
+  ]);
+
+  // Add notification function
+  const addNotification = useCallback((type, message) => {
+    const newNotification = {
+      id: Date.now(),
+      type,
+      message,
+      time: 'Just now'
+    };
+    setNotifications(prev => [newNotification, ...prev.slice(0, 4)]);
+  }, []);
+
+  // Enhanced admin panel with notifications and real-time features
+  const AdminPanel = () => {
+    const [showNotifications, setShowNotifications] = useState(false);
+    
+    const renderTabContent = () => {
+      switch(activeAdminTab) {
         case 'dashboard':
           return (
             <div className="admin-dashboard">
-              {/* Key Metrics */}
+              {/* Real-time Status Bar */}
+              <div className="status-bar">
+                <div className="status-item">
+                  <span className="status-icon online">🟢</span>
+                  <span>System Online</span>
+                </div>
+                <div className="status-item">
+                  <span className="status-icon">⏱️</span>
+                  <span>Uptime: {adminData.uptime}</span>
+                </div>
+                <div className="status-item">
+                  <span className="status-icon">📊</span>
+                  <span>CPU: {adminData.cpuUsage.toFixed(1)}%</span>
+                </div>
+                <div className="status-item">
+                  <span className="status-icon">💾</span>
+                  <span>RAM: {adminData.memoryUsage.toFixed(1)}%</span>
+                </div>
+                <div className="status-item">
+                  <span className="status-icon">💿</span>
+                  <span>Storage: {adminData.storageUsage.toFixed(1)}%</span>
+                </div>
+              </div>
+
+              {/* Enhanced Key Metrics */}
               <div className="metrics-row">
-                <div className="metric-card primary">
+                <div className="metric-card primary animated">
                   <div className="metric-icon">👥</div>
                   <div className="metric-content">
                     <h3>{adminData.totalVisitors.toLocaleString()}</h3>
                     <p>Total Visitors</p>
                     <span className="metric-change positive">+12.5%</span>
                   </div>
+                  <div className="metric-sparkline">
+                    <div className="sparkline-bar" style={{height: '60%'}}></div>
+                    <div className="sparkline-bar" style={{height: '80%'}}></div>
+                    <div className="sparkline-bar" style={{height: '45%'}}></div>
+                    <div className="sparkline-bar" style={{height: '90%'}}></div>
+                    <div className="sparkline-bar" style={{height: '70%'}}></div>
+                  </div>
                 </div>
-                <div className="metric-card success">
+                <div className="metric-card success animated">
                   <div className="metric-icon">⬇️</div>
                   <div className="metric-content">
                     <h3>{adminData.totalDownloads.toLocaleString()}</h3>
                     <p>Total Downloads</p>
                     <span className="metric-change positive">+8.3%</span>
                   </div>
+                  <div className="metric-trend">📈</div>
                 </div>
-                <div className="metric-card warning">
+                <div className="metric-card warning animated">
                   <div className="metric-icon">🟢</div>
                   <div className="metric-content">
                     <h3>{adminData.activeUsers.toLocaleString()}</h3>
                     <p>Active Users</p>
                     <span className="metric-change positive">+15.7%</span>
                   </div>
+                  <div className="metric-pulse"></div>
                 </div>
-                <div className="metric-card info">
+                <div className="metric-card info animated">
                   <div className="metric-icon">📊</div>
                   <div className="metric-content">
                     <h3>{adminData.todayVisitors}</h3>
                     <p>Today's Visitors</p>
                     <span className="metric-change positive">+23.1%</span>
                   </div>
+                  <div className="metric-counter">+{Math.floor(Math.random() * 5) + 1}</div>
                 </div>
               </div>
 
-              {/* Charts Row */}
+              {/* Enhanced Charts Row */}
               <div className="charts-row">
-                <div className="chart-card">
-                  <h3>📈 Traffic Analytics</h3>
+                <div className="chart-card enhanced">
+                  <div className="chart-header">
+                    <h3>📈 Traffic Analytics</h3>
+                    <div className="chart-controls">
+                      <button className="chart-btn active">7D</button>
+                      <button className="chart-btn">30D</button>
+                      <button className="chart-btn">90D</button>
+                    </div>
+                  </div>
                   <div className="chart-placeholder">
                     <div className="chart-bars">
-                      <div className="bar" style={{height: '60%'}}><span>Mon</span></div>
-                      <div className="bar" style={{height: '80%'}}><span>Tue</span></div>
-                      <div className="bar" style={{height: '45%'}}><span>Wed</span></div>
-                      <div className="bar" style={{height: '90%'}}><span>Thu</span></div>
-                      <div className="bar" style={{height: '70%'}}><span>Fri</span></div>
-                      <div className="bar" style={{height: '85%'}}><span>Sat</span></div>
-                      <div className="bar" style={{height: '95%'}}><span>Sun</span></div>
+                      <div className="bar animated" style={{height: '60%', animationDelay: '0.1s'}}><span>Mon</span></div>
+                      <div className="bar animated" style={{height: '80%', animationDelay: '0.2s'}}><span>Tue</span></div>
+                      <div className="bar animated" style={{height: '45%', animationDelay: '0.3s'}}><span>Wed</span></div>
+                      <div className="bar animated" style={{height: '90%', animationDelay: '0.4s'}}><span>Thu</span></div>
+                      <div className="bar animated" style={{height: '70%', animationDelay: '0.5s'}}><span>Fri</span></div>
+                      <div className="bar animated" style={{height: '85%', animationDelay: '0.6s'}}><span>Sat</span></div>
+                      <div className="bar animated" style={{height: '95%', animationDelay: '0.7s'}}><span>Sun</span></div>
                     </div>
                   </div>
                 </div>
-                <div className="chart-card">
-                  <h3>🎯 Popular Content</h3>
+                <div className="chart-card enhanced">
+                  <div className="chart-header">
+                    <h3>🎯 Popular Content</h3>
+                    <div className="refresh-indicator">🔄</div>
+                  </div>
                   <div className="content-list">
-                    <div className="content-item">
+                    <div className="content-item enhanced">
                       <span className="content-name">Advanced Trainers</span>
                       <div className="progress-bar">
-                        <div className="progress" style={{width: '85%'}}></div>
+                        <div className="progress animated" style={{width: '85%', animationDelay: '0.1s'}}></div>
                       </div>
                       <span className="content-value">85%</span>
                     </div>
-                    <div className="content-item">
+                    <div className="content-item enhanced">
                       <span className="content-name">Script Mods</span>
                       <div className="progress-bar">
-                        <div className="progress" style={{width: '72%'}}></div>
+                        <div className="progress animated" style={{width: '72%', animationDelay: '0.2s'}}></div>
                       </div>
                       <span className="content-value">72%</span>
                     </div>
-                    <div className="content-item">
+                    <div className="content-item enhanced">
                       <span className="content-name">Video Tutorials</span>
                       <div className="progress-bar">
-                        <div className="progress" style={{width: '68%'}}></div>
+                        <div className="progress animated" style={{width: '68%', animationDelay: '0.3s'}}></div>
                       </div>
                       <span className="content-value">68%</span>
                     </div>
-                    <div className="content-item">
+                    <div className="content-item enhanced">
                       <span className="content-name">Quality Tools</span>
                       <div className="progress-bar">
-                        <div className="progress" style={{width: '59%'}}></div>
+                        <div className="progress animated" style={{width: '59%', animationDelay: '0.4s'}}></div>
                       </div>
                       <span className="content-value">59%</span>
                     </div>
@@ -790,61 +891,97 @@ const App = () => {
                 </div>
               </div>
 
-              {/* System Status */}
+              {/* Enhanced Status Row */}
               <div className="status-row">
-                <div className="status-card">
+                <div className="status-card enhanced">
                   <h3>🖥️ System Performance</h3>
                   <div className="performance-metrics">
-                    <div className="perf-item">
+                    <div className="perf-item enhanced">
                       <span>CPU Usage</span>
                       <div className="perf-bar">
-                        <div className="perf-fill cpu" style={{width: `${adminData.cpuUsage}%`}}></div>
+                        <div className="perf-fill cpu animated" style={{width: `${adminData.cpuUsage}%`}}></div>
                       </div>
-                      <span>{adminData.cpuUsage}%</span>
+                      <span className="perf-value">{adminData.cpuUsage.toFixed(1)}%</span>
                     </div>
-                    <div className="perf-item">
+                    <div className="perf-item enhanced">
                       <span>Memory</span>
                       <div className="perf-bar">
-                        <div className="perf-fill memory" style={{width: `${adminData.memoryUsage}%`}}></div>
+                        <div className="perf-fill memory animated" style={{width: `${adminData.memoryUsage}%`}}></div>
                       </div>
-                      <span>{adminData.memoryUsage}%</span>
+                      <span className="perf-value">{adminData.memoryUsage.toFixed(1)}%</span>
                     </div>
-                    <div className="perf-item">
+                    <div className="perf-item enhanced">
                       <span>Storage</span>
                       <div className="perf-bar">
-                        <div className="perf-fill storage" style={{width: `${adminData.storageUsage}%`}}></div>
+                        <div className="perf-fill storage animated" style={{width: `${adminData.storageUsage}%`}}></div>
                       </div>
-                      <span>{adminData.storageUsage}%</span>
+                      <span className="perf-value">{adminData.storageUsage.toFixed(1)}%</span>
                     </div>
                   </div>
+                  <div className="performance-actions">
+                    <button className="perf-action-btn" onClick={() => addNotification('info', 'System optimization started')}>
+                      🚀 Optimize
+                    </button>
+                    <button className="perf-action-btn" onClick={() => addNotification('success', 'Cache cleared successfully')}>
+                      🧹 Clear Cache
+                    </button>
+                  </div>
                 </div>
-                <div className="status-card">
+                <div className="status-card enhanced">
                   <h3>⚡ Quick Actions</h3>
                   <div className="quick-actions-grid">
-                    <button className="quick-action">
+                    <button className="quick-action enhanced" onClick={() => addNotification('info', 'Creating new post...')}>
                       <span className="qa-icon">📝</span>
                       <span>New Post</span>
                     </button>
-                    <button className="quick-action">
+                    <button className="quick-action enhanced" onClick={() => setActiveAdminTab('analytics')}>
                       <span className="qa-icon">📊</span>
                       <span>Analytics</span>
                     </button>
-                    <button className="quick-action">
+                    <button className="quick-action enhanced" onClick={() => addNotification('info', 'Opening user management...')}>
                       <span className="qa-icon">👥</span>
                       <span>Users</span>
                     </button>
-                    <button className="quick-action">
+                    <button className="quick-action enhanced" onClick={() => setActiveAdminTab('system')}>
                       <span className="qa-icon">⚙️</span>
                       <span>Settings</span>
                     </button>
-                    <button className="quick-action">
+                    <button className="quick-action enhanced" onClick={() => addNotification('success', 'Backup initiated successfully')}>
                       <span className="qa-icon">💾</span>
                       <span>Backup</span>
                     </button>
-                    <button className="quick-action">
+                    <button className="quick-action enhanced" onClick={() => addNotification('warning', 'Checking for updates...')}>
                       <span className="qa-icon">🔄</span>
                       <span>Update</span>
                     </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Activity Feed */}
+              <div className="activity-feed">
+                <h3>📋 Recent Activity</h3>
+                <div className="activity-list">
+                  <div className="activity-item">
+                    <div className="activity-icon success">✅</div>
+                    <div className="activity-content">
+                      <p>User 'GamerPro123' downloaded Advanced Trainer Pack</p>
+                      <span className="activity-time">2 minutes ago</span>
+                    </div>
+                  </div>
+                  <div className="activity-item">
+                    <div className="activity-icon info">📺</div>
+                    <div className="activity-content">
+                      <p>New video tutorial published: "Script Installation Guide"</p>
+                      <span className="activity-time">15 minutes ago</span>
+                    </div>
+                  </div>
+                  <div className="activity-item">
+                    <div className="activity-icon warning">⚠️</div>
+                    <div className="activity-content">
+                      <p>High traffic detected from Discord referrals</p>
+                      <span className="activity-time">32 minutes ago</span>
+                    </div>
                   </div>
                 </div>
               </div>
