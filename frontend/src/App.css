@@ -2749,12 +2749,39 @@ body {
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+  
+  /* Additional stability measures */
+  position: relative !important;
+  z-index: 1 !important;
+  font-family: inherit !important;
+  line-height: 1.5 !important;
+  
+  /* Prevent any browser-specific styling changes */
+  -webkit-border-radius: 8px !important;
+  -moz-border-radius: 8px !important;
+  -webkit-box-sizing: border-box !important;
+  -moz-box-sizing: border-box !important;
+  
+  /* Cursor stability */
+  caret-color: #8b5cf6 !important;
+  
+  /* Prevent selection color changes */
+  selection-background: rgba(139, 92, 246, 0.3) !important;
+  -webkit-selection-background: rgba(139, 92, 246, 0.3) !important;
+  -moz-selection-background: rgba(139, 92, 246, 0.3) !important;
 }
 
 .ultra-stable-input:focus {
   border-color: #8b5cf6 !important;
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2) !important;
   transition: none !important;
+  outline: none !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ultra-stable-input:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 .ultra-stable-input:disabled {
@@ -2764,6 +2791,27 @@ body {
 }
 
 .ultra-stable-input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important;
+  transition: none !important;
+}
+
+.ultra-stable-input::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important;
+}
+
+.ultra-stable-input::-moz-placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important;
+}
+
+.ultra-stable-input:-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important;
+}
+
+.ultra-stable-input:-moz-placeholder {
   color: rgba(255, 255, 255, 0.5) !important;
   opacity: 1 !important;
 }
