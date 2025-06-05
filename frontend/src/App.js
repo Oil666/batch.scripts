@@ -82,7 +82,7 @@ const App = () => {
       {/* Hero Section */}
       <section id="home" className="hero">
         <div className="hero-background">
-          <img src="https://images.unsplash.com/photo-1533654238074-8841f6e8e610" alt="Gaming Background" className="hero-bg-image" />
+          <img src="https://images.pexels.com/photos/8728559/pexels-photo-8728559.jpeg" alt="Panda Gaming Background" className="hero-bg-image" />
           <div className="hero-overlay"></div>
         </div>
         <div className="hero-content">
