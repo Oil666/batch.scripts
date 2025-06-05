@@ -158,6 +158,18 @@ body {
   mix-blend-mode: overlay;
 }
 
+.panda-accent-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 30% 70%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+  z-index: 3;
+  mix-blend-mode: screen;
+}
+
 .hero-overlay {
   position: absolute;
   top: 0;
@@ -168,7 +180,7 @@ body {
     rgba(10, 10, 10, 0.8) 0%,
     rgba(0, 212, 255, 0.1) 50%,
     rgba(139, 92, 246, 0.1) 100%);
-  z-index: -1;
+  z-index: 4;
 }
 
 .hero-content {
