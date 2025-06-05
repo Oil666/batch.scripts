@@ -1487,6 +1487,108 @@ body {
   }
 }
 
+/* Anti-Flickering Optimizations */
+.admin-login-overlay.stable {
+  contain: layout style;
+  will-change: auto;
+}
+
+.admin-login.stable {
+  contain: layout style;
+  will-change: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.admin-login-form.stable {
+  contain: layout;
+  isolation: isolate;
+}
+
+.form-group.stable {
+  contain: layout;
+  will-change: auto;
+}
+
+.stable-input {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 8px !important;
+  padding: 0.75rem !important;
+  color: #ffffff !important;
+  font-size: 1rem !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+  will-change: border-color, box-shadow !important;
+  backface-visibility: hidden !important;
+  transform: translateZ(0) !important;
+  contain: layout style !important;
+  outline: none !important;
+}
+
+.stable-input:focus {
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2) !important;
+}
+
+.stable-input:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.stable-input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Stable button states */
+.admin-login-btn.stable,
+.quick-login-btn.stable,
+.instant-login-btn.stable {
+  contain: layout style;
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.admin-error.stable,
+.lockout-warning.stable {
+  contain: layout;
+  will-change: auto;
+}
+
+.quick-login.stable {
+  contain: layout;
+  will-change: auto;
+}
+
+/* Form stability improvements */
+.admin-login-form.stable input {
+  contain: layout style;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.admin-login-form.stable label {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Prevent text selection interference */
+.admin-login.stable * {
+  user-select: text;
+}
+
+.admin-login.stable input {
+  user-select: text !important;
+}
+
+.admin-login.stable label,
+.admin-login.stable button,
+.admin-login.stable .admin-credentials-display,
+.admin-login.stable .security-info {
+  user-select: none;
+}
+
 /* Enhanced Security Styles */
 .security-warning {
   position: fixed;
