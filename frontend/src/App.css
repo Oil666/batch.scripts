@@ -349,8 +349,37 @@ body {
 /* Services Section */
 .services {
   padding: 8rem 0;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   position: relative;
+  overflow: hidden;
+}
+
+.services-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+}
+
+.services-bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.15;
+}
+
+.services-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, 
+    rgba(10, 10, 10, 0.9) 0%,
+    rgba(26, 26, 26, 0.85) 50%,
+    rgba(59, 130, 246, 0.1) 100%);
+  z-index: -1;
 }
 
 .services::before {
