@@ -665,7 +665,8 @@ const App = () => {
       {/* Hero Section */}
       <section id="home" className="hero">
         <div className="hero-background">
-          <img src="https://images.pexels.com/photos/8728559/pexels-photo-8728559.jpeg" alt="Panda Gaming Background" className="hero-bg-image" />
+          <img src="https://images.pexels.com/photos/8728559/pexels-photo-8728559.jpeg" alt="Gaming Tech Background" className="hero-bg-image hero-bg-primary" />
+          <img src="https://images.unsplash.com/photo-1573767291321-c0af2eaf5266" alt="Circuit City Background" className="hero-bg-image hero-bg-secondary" />
           <div className="hero-overlay"></div>
         </div>
         <div className="hero-content">
