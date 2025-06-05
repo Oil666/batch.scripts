@@ -1053,6 +1053,48 @@ body {
   font-size: 0.9rem;
 }
 
+.admin-credentials-display {
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.admin-credentials-display p {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.admin-credentials-display p:first-child {
+  font-weight: 700;
+  color: #00d4ff;
+  margin-bottom: 0.5rem;
+}
+
+.quick-login {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.quick-login-btn {
+  background: rgba(0, 212, 255, 0.2);
+  border: 1px solid rgba(0, 212, 255, 0.4);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  color: #00d4ff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.quick-login-btn:hover {
+  background: rgba(0, 212, 255, 0.3);
+  transform: translateY(-2px);
+}
+
 .admin-content {
   height: calc(100% - 80px);
   overflow-y: auto;
