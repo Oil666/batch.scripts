@@ -746,6 +746,10 @@ const App = () => {
 
       {/* Features Section */}
       <section className="features">
+        <div className="features-background">
+          <img src="https://images.unsplash.com/photo-1651340608985-d25cc73156e8" alt="Circuit Pattern Background" className="features-bg-image" />
+          <div className="features-overlay"></div>
+        </div>
         <div className="container">
           <div className="features-content">
             <div className="features-text">
