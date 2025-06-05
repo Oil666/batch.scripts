@@ -135,7 +135,7 @@ const App = () => {
   ];
 
   const AdminPanel = () => (
-    <div className="admin-panel-overlay">
+    <div className="admin-panel-overlay" onClick={(e) => e.target === e.currentTarget && setShowAdminPanel(false)}>
       <div className="admin-panel">
         <div className="admin-header">
           <h2>🛡️ PANDA_MODZ Admin Panel</h2>
@@ -143,6 +143,10 @@ const App = () => {
         </div>
         
         <div className="admin-content">
+          <div className="admin-welcome">
+            <p className="welcome-message">✅ Successfully logged in as Administrator</p>
+          </div>
+          
           <div className="admin-stats">
             <div className="stat-card">
               <h3>📺 Videos</h3>
