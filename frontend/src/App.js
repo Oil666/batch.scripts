@@ -235,8 +235,13 @@ const App = () => {
   );
 
   const AdminLogin = () => (
-    <div className="admin-login-overlay">
-      <div className="admin-login">
+    <div className="admin-login-overlay" onClick={(e) => {
+      // Only close if clicking the overlay itself, not the form
+      if (e.target === e.currentTarget) {
+        setShowAdminLogin(false);
+      }
+    }}>
+      <div className="admin-login" onClick={(e) => e.stopPropagation()}>
         <div className="admin-login-header">
           <h2>🔐 Admin Access</h2>
           <button className="admin-close" onClick={() => setShowAdminLogin(false)}>✕</button>
@@ -254,7 +259,12 @@ const App = () => {
             <input
               type="text"
               value={loginUsername}
-              onChange={(e) => setLoginUsername(e.target.value)}
+              onChange={(e) => {
+                e.stopPropagation();
+                setLoginUsername(e.target.value);
+              }}
+              onFocus={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
               placeholder="Enter admin username"
               required
               autoComplete="username"
@@ -266,7 +276,12 @@ const App = () => {
             <input
               type="password"
               value={loginPassword}
-              onChange={(e) => setLoginPassword(e.target.value)}
+              onChange={(e) => {
+                e.stopPropagation();
+                setLoginPassword(e.target.value);
+              }}
+              onFocus={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
               placeholder="Enter admin password"
               required
               autoComplete="current-password"
@@ -275,13 +290,16 @@ const App = () => {
           
           {loginError && <div className="admin-error">{loginError}</div>}
           
-          <button type="submit" className="admin-login-btn">🚀 Access Admin Panel</button>
+          <button type="submit" className="admin-login-btn" onClick={(e) => e.stopPropagation()}>
+            🚀 Access Admin Panel
+          </button>
           
           <div className="quick-login">
             <button 
               type="button" 
               className="quick-login-btn"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setLoginUsername('admin');
                 setLoginPassword('pandamodz2024');
               }}
@@ -292,7 +310,8 @@ const App = () => {
             <button 
               type="button" 
               className="instant-login-btn"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setIsAdminLoggedIn(true);
                 setShowAdminLogin(false);
                 setShowAdminPanel(true);
