@@ -227,21 +227,28 @@ const App = () => {
             </p>
           </div>
           <div className="showcase-grid">
-            {showcaseItems.map((item, index) => (
+            {videos.map((video, index) => (
               <div key={index} className="showcase-card">
-                <div className="showcase-image">
-                  <img src={item.image} alt={item.title} />
-                  <div className="showcase-overlay">
-                    <div className="showcase-stats">{item.stats}</div>
-                  </div>
+                <div className="showcase-video">
+                  <iframe
+                    src={video.embedUrl}
+                    title={video.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
                 </div>
                 <div className="showcase-content">
-                  <h3 className="showcase-title">{item.title}</h3>
-                  <p className="showcase-description">{item.description}</p>
-                  <button className="showcase-button">
-                    Download Now
-                    <span className="download-icon">⬇️</span>
-                  </button>
+                  <h3 className="showcase-title">{video.title}</h3>
+                  <p className="showcase-description">{video.description}</p>
+                  <a
+                    href={`https://www.youtube.com/watch?v=${video.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="showcase-button"
+                  >
+                    Watch on YouTube
+                    <span className="youtube-icon">📺</span>
+                  </a>
                 </div>
               </div>
             ))}
