@@ -857,7 +857,38 @@ body {
 /* Community Section */
 .community {
   padding: 8rem 0;
-  background: #0a0a0a;
+  position: relative;
+  overflow: hidden;
+}
+
+.community-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+}
+
+.community-bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.25;
+  filter: hue-rotate(180deg) saturate(0.8);
+}
+
+.community-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, 
+    rgba(10, 10, 10, 0.9) 0%,
+    rgba(0, 212, 255, 0.1) 50%,
+    rgba(10, 10, 10, 0.9) 100%);
+  z-index: -1;
 }
 
 .community-content {
