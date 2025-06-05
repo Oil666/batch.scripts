@@ -1049,7 +1049,8 @@ body {
   }
   
   .services-grid,
-  .showcase-grid {
+  .showcase-grid,
+  .videos-grid {
     grid-template-columns: 1fr;
   }
   
