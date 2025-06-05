@@ -591,11 +591,226 @@ const App = () => {
     );
   });
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    element.scrollIntoView({ behavior: 'smooth' });
-    setActiveSection(sectionId);
+  // Enhanced interactive features
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [selectedMod, setSelectedMod] = useState(null);
+  const [downloadCount, setDownloadCount] = useState(89452);
+  const [onlineUsers, setOnlineUsers] = useState(1847);
+  const [showToast, setShowToast] = useState(null);
+  const [isTypingEffect, setIsTypingEffect] = useState(true);
+  const [typedText, setTypedText] = useState('');
+  const [currentServiceIndex, setCurrentServiceIndex] = useState(0);
+
+  // Typing effect for hero title
+  const heroTexts = [
+    'ELEVATE YOUR GAMING EXPERIENCE',
+    'UNLOCK NEW POSSIBILITIES',
+    'ENHANCE YOUR GAMEPLAY',
+    'MASTER YOUR GAMES'
+  ];
+
+  useEffect(() => {
+    if (isTypingEffect) {
+      let currentText = heroTexts[currentServiceIndex];
+      let index = 0;
+      
+      const typingInterval = setInterval(() => {
+        if (index <= currentText.length) {
+          setTypedText(currentText.slice(0, index));
+          index++;
+        } else {
+          clearInterval(typingInterval);
+          setTimeout(() => {
+            setCurrentServiceIndex((prev) => (prev + 1) % heroTexts.length);
+            setTypedText('');
+          }, 2000);
+        }
+      }, 100);
+
+      return () => clearInterval(typingInterval);
+    }
+  }, [currentServiceIndex, isTypingEffect]);
+
+  // Real-time counter updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDownloadCount(prev => prev + Math.floor(Math.random() * 3));
+      setOnlineUsers(prev => prev + Math.floor((Math.random() - 0.5) * 10));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Toast notification system
+  const showToastMessage = useCallback((message, type = 'success') => {
+    setShowToast({ message, type, id: Date.now() });
+    setTimeout(() => setShowToast(null), 3000);
+  }, []);
+
+  // Enhanced mod data with download functionality
+  const modData = [
+    {
+      id: 'trainer-pack-1',
+      title: 'Ultimate Trainer Pack',
+      description: 'Comprehensive collection of game trainers for 50+ popular titles',
+      downloads: 25847,
+      rating: 4.9,
+      category: 'Trainers',
+      image: 'https://images.unsplash.com/photo-1656662961786-b04873ceb4b9',
+      features: ['50+ Game Support', 'Auto-Update', 'Safe & Secure', 'One-Click Install'],
+      fileSize: '12.5 MB',
+      version: '2.1.0'
+    },
+    {
+      id: 'script-collection',
+      title: 'Advanced Script Collection',
+      description: 'Powerful automation scripts for enhanced gameplay experience',
+      downloads: 18923,
+      rating: 4.8,
+      category: 'Scripts',
+      image: 'https://images.unsplash.com/photo-1612404475557-369522ece36f',
+      features: ['Auto-Farm Scripts', 'Quality of Life', 'Customizable', 'Regular Updates'],
+      fileSize: '8.7 MB',
+      version: '1.8.5'
+    },
+    {
+      id: 'quality-tools',
+      title: 'Developer Tools Suite',
+      description: 'Professional-grade tools for game modification and development',
+      downloads: 12456,
+      rating: 4.7,
+      category: 'Tools',
+      image: 'https://images.pexels.com/photos/8728559/pexels-photo-8728559.jpeg',
+      features: ['Memory Editor', 'Process Monitor', 'Code Injection', 'Debug Tools'],
+      fileSize: '45.2 MB',
+      version: '3.0.1'
+    }
+  ];
+
+  // Download modal component
+  const DownloadModal = () => {
+    if (!showDownloadModal || !selectedMod) return null;
+
+    return (
+      <div className="download-modal-overlay" onClick={() => setShowDownloadModal(false)}>
+        <div className="download-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h3>📦 Download {selectedMod.title}</h3>
+            <button className="modal-close" onClick={() => setShowDownloadModal(false)}>✕</button>
+          </div>
+          
+          <div className="modal-content">
+            <div className="mod-preview">
+              <img src={selectedMod.image} alt={selectedMod.title} />
+              <div className="mod-info">
+                <h4>{selectedMod.title}</h4>
+                <p>{selectedMod.description}</p>
+                <div className="mod-stats">
+                  <span className="stat">
+                    <span className="stat-icon">⭐</span>
+                    <span>{selectedMod.rating}/5</span>
+                  </span>
+                  <span className="stat">
+                    <span className="stat-icon">⬇️</span>
+                    <span>{selectedMod.downloads.toLocaleString()}</span>
+                  </span>
+                  <span className="stat">
+                    <span className="stat-icon">📁</span>
+                    <span>{selectedMod.fileSize}</span>
+                  </span>
+                  <span className="stat">
+                    <span className="stat-icon">🔢</span>
+                    <span>v{selectedMod.version}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mod-features">
+              <h5>📋 Features:</h5>
+              <ul>
+                {selectedMod.features.map((feature, index) => (
+                  <li key={index}>✅ {feature}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="download-section">
+              <div className="download-warning">
+                <h5>⚠️ Important Notice:</h5>
+                <p>• Only use mods in single-player games</p>
+                <p>• Always backup your save files</p>
+                <p>• Disable antivirus temporarily during installation</p>
+                <p>• Join our Discord for support</p>
+              </div>
+
+              <div className="download-actions">
+                <button 
+                  className="download-btn primary"
+                  onClick={() => {
+                    setDownloadCount(prev => prev + 1);
+                    showToastMessage(`${selectedMod.title} download started!`);
+                    setShowDownloadModal(false);
+                  }}
+                >
+                  🚀 Download Now
+                </button>
+                <button className="download-btn secondary">
+                  📖 View Documentation
+                </button>
+                <a 
+                  href="https://discord.com/invite/sYT5UXkv7F" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="download-btn discord"
+                >
+                  💬 Get Support
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
+
+  // Toast notification component
+  const ToastNotification = () => {
+    if (!showToast) return null;
+
+    return (
+      <div className={`toast-notification ${showToast.type}`}>
+        <div className="toast-content">
+          <span className="toast-icon">
+            {showToast.type === 'success' ? '✅' : showToast.type === 'warning' ? '⚠️' : 'ℹ️'}
+          </span>
+          <span className="toast-message">{showToast.message}</span>
+        </div>
+        <button className="toast-close" onClick={() => setShowToast(null)}>✕</button>
+      </div>
+    );
+  };
+
+  // Live stats component
+  const LiveStats = () => (
+    <div className="live-stats">
+      <div className="stat-item">
+        <span className="stat-number">{downloadCount.toLocaleString()}</span>
+        <span className="stat-label">Total Downloads</span>
+        <span className="stat-indicator">📈</span>
+      </div>
+      <div className="stat-item">
+        <span className="stat-number">{onlineUsers.toLocaleString()}</span>
+        <span className="stat-label">Online Users</span>
+        <span className="stat-indicator online">🟢</span>
+      </div>
+      <div className="stat-item">
+        <span className="stat-number">99.9%</span>
+        <span className="stat-label">Uptime</span>
+        <span className="stat-indicator">⚡</span>
+      </div>
+    </div>
+  );
 
   const services = [
     {
