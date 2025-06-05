@@ -794,6 +794,10 @@ const App = () => {
 
       {/* Showcase Section */}
       <section id="showcase" className="showcase">
+        <div className="showcase-background">
+          <img src="https://images.pexels.com/photos/7789851/pexels-photo-7789851.jpeg" alt="Premium Tech Background" className="showcase-bg-image" />
+          <div className="showcase-overlay"></div>
+        </div>
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Featured Projects</h2>
