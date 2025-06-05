@@ -4,15 +4,17 @@ import './App.css';
 const App = () => {
   const [scrollY, setScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState('home');
+  // Admin state
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const [adminCredentials, setAdminCredentials] = useState({ username: '', password: '' });
-  const [adminError, setAdminError] = useState('');
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
 
-  // Admin credentials (in a real app, this would be handled securely on the backend)
-  const ADMIN_USERNAME = 'admin';
-  const ADMIN_PASSWORD = 'pandamodz2024';
+  // Simple admin credentials
+  const ADMIN_USER = 'admin';
+  const ADMIN_PASS = 'pandamodz2024';
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
