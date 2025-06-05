@@ -685,7 +685,7 @@ body {
   gap: 1rem;
 }
 
-.discord-button, .newsletter-button {
+.discord-button, .newsletter-button, .youtube-button {
   padding: 1.2rem 2rem;
   border: none;
   border-radius: 12px;
@@ -700,6 +700,22 @@ body {
   color: #ffffff;
   position: relative;
   overflow: hidden;
+}
+
+.youtube-button {
+  background: linear-gradient(135deg, #ff0000, #cc0000);
+  box-shadow: 0 8px 32px rgba(255, 0, 0, 0.3);
+}
+
+.youtube-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(255, 0, 0, 0.4);
+}
+
+.channel-info {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-left: auto;
 }
 
 .discord-button {
