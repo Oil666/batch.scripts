@@ -18,11 +18,25 @@ const App = () => {
   const [sessionExpiry, setSessionExpiry] = useState(null);
   const [showSecurityWarning, setShowSecurityWarning] = useState(false);
   
+  // Enhanced Admin Panel State
+  const [activeAdminTab, setActiveAdminTab] = useState('dashboard');
+  const [adminData, setAdminData] = useState({
+    totalVisitors: 15847,
+    todayVisitors: 324,
+    totalDownloads: 89452,
+    activeUsers: 1847,
+    serverStatus: 'online',
+    cpuUsage: 34,
+    memoryUsage: 67,
+    storageUsage: 45,
+    uptime: '7d 14h 23m',
+    lastBackup: '2 hours ago',
+    version: 'v2.1.0'
+  });
+
   // Security refs
   const loginTimeoutRef = useRef(null);
   const sessionTimeoutRef = useRef(null);
-  const usernameRef = useRef(null);
-  const passwordRef = useRef(null);
 
   // Security constants
   const ADMIN_USER = 'admin';
@@ -30,10 +44,11 @@ const App = () => {
   const MAX_LOGIN_ATTEMPTS = 3;
   const LOCKOUT_DURATION = 300000; // 5 minutes
   const SESSION_DURATION = 1800000; // 30 minutes
-  const SECURITY_HEADERS = {
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-    'X-XSS-Protection': '1; mode=block'
+
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    element.scrollIntoView({ behavior: 'smooth' });
+    setActiveSection(sectionId);
   };
 
   useEffect(() => {
@@ -56,12 +71,10 @@ const App = () => {
         setSessionExpiry(currentTime + remainingTime);
         startSessionTimer(remainingTime);
       } else {
-        // Session expired
         handleSecureLogout();
       }
     }
 
-    // Check for lockout status
     const lockoutEnd = localStorage.getItem('pandaLockoutEnd');
     if (lockoutEnd && currentTime < parseInt(lockoutEnd)) {
       setIsLocked(true);
@@ -69,7 +82,6 @@ const App = () => {
       startLockoutTimer(parseInt(lockoutEnd) - currentTime);
     }
 
-    // Clear sensitive data on page unload
     const handleBeforeUnload = () => {
       if (sessionTimeoutRef.current) {
         clearTimeout(sessionTimeoutRef.current);
@@ -88,16 +100,7 @@ const App = () => {
     };
   }, []);
 
-  // Security: Input validation and sanitization
-  const sanitizeInput = useCallback((input) => {
-    if (typeof input !== 'string') return '';
-    return input
-      .replace(/[<>\"'&]/g, '') // Remove potential XSS characters
-      .trim()
-      .slice(0, 50); // Limit length
-  }, []);
-
-  // Security: Rate limiting for login attempts
+  // Security functions
   const startLockoutTimer = useCallback((duration) => {
     if (loginTimeoutRef.current) {
       clearTimeout(loginTimeoutRef.current);
@@ -112,7 +115,6 @@ const App = () => {
     }, duration);
   }, []);
 
-  // Security: Session management
   const startSessionTimer = useCallback((duration) => {
     if (sessionTimeoutRef.current) {
       clearTimeout(sessionTimeoutRef.current);
@@ -123,11 +125,10 @@ const App = () => {
       setTimeout(() => {
         handleSecureLogout();
         setShowSecurityWarning(false);
-      }, 30000); // 30 second warning
+      }, 30000);
     }, duration - 30000);
   }, []);
 
-  // Security: Secure logout
   const handleSecureLogout = useCallback(() => {
     setIsAdminLoggedIn(false);
     setShowAdminPanel(false);
@@ -136,43 +137,24 @@ const App = () => {
     setLoginPassword('');
     setSessionExpiry(null);
     
-    // Clear all session data
     localStorage.removeItem('pandaAdminSession');
     localStorage.removeItem('pandaSessionTime');
     
-    // Clear timeouts
     if (sessionTimeoutRef.current) {
       clearTimeout(sessionTimeoutRef.current);
     }
-    
-    // Security log
-    console.log('[SECURITY] Admin session terminated at:', new Date().toISOString());
   }, []);
 
-  // Enhanced login handler with security
   const handleAdminLogin = useCallback((e) => {
     e.preventDefault();
     
-    // Check if locked out
     if (isLocked) {
       const remainingTime = Math.ceil((lockoutTime - Date.now()) / 1000 / 60);
       setLoginError(`Account locked. Try again in ${remainingTime} minutes.`);
       return;
     }
 
-    // Sanitize inputs
-    const cleanUsername = sanitizeInput(loginUsername);
-    const cleanPassword = sanitizeInput(loginPassword);
-    
-    // Validate inputs
-    if (!cleanUsername || !cleanPassword) {
-      setLoginError('Invalid input detected');
-      return;
-    }
-
-    // Check credentials
-    if (cleanUsername === ADMIN_USER && cleanPassword === ADMIN_PASS) {
-      // Successful login
+    if (loginUsername.trim() === ADMIN_USER && loginPassword.trim() === ADMIN_PASS) {
       const currentTime = Date.now();
       const expiryTime = currentTime + SESSION_DURATION;
       
@@ -183,201 +165,22 @@ const App = () => {
       setLoginAttempts(0);
       setSessionExpiry(expiryTime);
       
-      // Store secure session
       localStorage.setItem('pandaAdminSession', 'true');
       localStorage.setItem('pandaSessionTime', currentTime.toString());
       localStorage.removeItem('pandaLoginAttempts');
       localStorage.removeItem('pandaLockoutEnd');
       
-      // Start session timer
       startSessionTimer(SESSION_DURATION);
       
-      // Clear form
       setLoginUsername('');
       setLoginPassword('');
       
-      // Security log
-      console.log('[SECURITY] Admin login successful at:', new Date().toISOString());
-      
     } else {
-      // Failed login
       const newAttempts = loginAttempts + 1;
       setLoginAttempts(newAttempts);
       localStorage.setItem('pandaLoginAttempts', newAttempts.toString());
       
       if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
-        // Lock account
-        const lockoutEnd = Date.now() + LOCKOUT_DURATION;
-        setIsLocked(true);
-        setLockoutTime(lockoutEnd);
-        localStorage.setItem('pandaLockoutEnd', lockoutEnd.toString());
-        startLockoutTimer(LOCKOUT_DURATION);
-        
-        setLoginError(`Too many failed attempts. Account locked for 5 minutes.`);
-        console.log('[SECURITY] Account locked due to failed login attempts at:', new Date().toISOString());
-      } else {
-        const remaining = MAX_LOGIN_ATTEMPTS - newAttempts;
-        setLoginError(`Invalid credentials. ${remaining} attempts remaining.`);
-        console.log('[SECURITY] Failed login attempt at:', new Date().toISOString());
-      }
-      
-      // Clear password field for security
-      setLoginPassword('');
-    }
-  }, [loginUsername, loginPassword, isLocked, lockoutTime, loginAttempts, sanitizeInput, startSessionTimer, startLockoutTimer]);
-
-  // Ultra-stable input handlers with debouncing to prevent flickering
-  const [stableUsername, setStableUsername] = useState('');
-  const [stablePassword, setStablePassword] = useState('');
-  const inputTimeoutRef = useRef(null);
-
-  // Immediate update handlers (no delays, no re-renders)
-  const handleUsernameInput = useCallback((e) => {
-    const value = e.target.value;
-    setStableUsername(value);
-    
-    // Clear any existing timeout
-    if (inputTimeoutRef.current) {
-      clearTimeout(inputTimeoutRef.current);
-    }
-    
-    // Update main state with minimal delay to prevent flickering
-    inputTimeoutRef.current = setTimeout(() => {
-      setLoginUsername(value);
-    }, 10);
-  }, []);
-
-  const handlePasswordInput = useCallback((e) => {
-    const value = e.target.value;
-    setStablePassword(value);
-    
-    // Clear any existing timeout
-    if (inputTimeoutRef.current) {
-      clearTimeout(inputTimeoutRef.current);
-    }
-    
-    // Update main state with minimal delay to prevent flickering
-    inputTimeoutRef.current = setTimeout(() => {
-      setLoginPassword(value);
-    }, 10);
-  }, []);
-
-  // Sync stable states with main states when form opens
-  useEffect(() => {
-    if (showAdminLogin) {
-      setStableUsername(loginUsername);
-      setStablePassword(loginPassword);
-    }
-  }, [showAdminLogin, loginUsername, loginPassword]);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (inputTimeoutRef.current) {
-        clearTimeout(inputTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Ultra-stable form handlers
-  const handleStableQuickFill = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setStableUsername('admin');
-    setStablePassword('pandamodz2024');
-    setLoginUsername('admin');
-    setLoginPassword('pandamodz2024');
-  }, []);
-
-  const handleStableInstantAccess = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!isLocked) {
-      const currentTime = Date.now();
-      const expiryTime = currentTime + SESSION_DURATION;
-      
-      setIsAdminLoggedIn(true);
-      setShowAdminLogin(false);
-      setShowAdminPanel(true);
-      setLoginError('');
-      setSessionExpiry(expiryTime);
-      
-      localStorage.setItem('pandaAdminSession', 'true');
-      localStorage.setItem('pandaSessionTime', currentTime.toString());
-      startSessionTimer(SESSION_DURATION);
-    }
-  }, [isLocked, startSessionTimer]);
-
-  // Ultra-stable close handler
-  const handleStableCloseLogin = useCallback((e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    setShowAdminLogin(false);
-    setLoginError('');
-    setStableUsername('');
-    setStablePassword('');
-  }, []);
-
-  // Enhanced login handler that uses stable values
-  const handleStableAdminLogin = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Use stable values for validation
-    const username = stableUsername || loginUsername;
-    const password = stablePassword || loginPassword;
-    
-    // Check if locked out
-    if (isLocked) {
-      const remainingTime = Math.ceil((lockoutTime - Date.now()) / 1000 / 60);
-      setLoginError(`Account locked. Try again in ${remainingTime} minutes.`);
-      return;
-    }
-
-    // Validate inputs
-    if (!username.trim() || !password.trim()) {
-      setLoginError('Please enter both username and password');
-      return;
-    }
-
-    // Check credentials
-    if (username.trim() === 'admin' && password.trim() === 'pandamodz2024') {
-      // Successful login
-      const currentTime = Date.now();
-      const expiryTime = currentTime + SESSION_DURATION;
-      
-      setIsAdminLoggedIn(true);
-      setShowAdminLogin(false);
-      setShowAdminPanel(true);
-      setLoginError('');
-      setLoginAttempts(0);
-      setSessionExpiry(expiryTime);
-      
-      // Store secure session
-      localStorage.setItem('pandaAdminSession', 'true');
-      localStorage.setItem('pandaSessionTime', currentTime.toString());
-      localStorage.removeItem('pandaLoginAttempts');
-      localStorage.removeItem('pandaLockoutEnd');
-      
-      // Start session timer
-      startSessionTimer(SESSION_DURATION);
-      
-      // Clear forms
-      setLoginUsername('');
-      setLoginPassword('');
-      setStableUsername('');
-      setStablePassword('');
-      
-    } else {
-      // Failed login
-      const newAttempts = loginAttempts + 1;
-      setLoginAttempts(newAttempts);
-      localStorage.setItem('pandaLoginAttempts', newAttempts.toString());
-      
-      if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
-        // Lock account
         const lockoutEnd = Date.now() + LOCKOUT_DURATION;
         setIsLocked(true);
         setLockoutTime(lockoutEnd);
@@ -390,428 +193,11 @@ const App = () => {
         setLoginError(`Invalid credentials. ${remaining} attempts remaining.`);
       }
       
-      // Clear password field for security
-      setStablePassword('');
       setLoginPassword('');
     }
-  }, [stableUsername, stablePassword, loginUsername, loginPassword, isLocked, lockoutTime, loginAttempts, startSessionTimer, startLockoutTimer]);
+  }, [loginUsername, loginPassword, isLocked, lockoutTime, loginAttempts, startSessionTimer, startLockoutTimer]);
 
-  // Completely re-written AdminLogin component with maximum stability
-  const AdminLogin = React.memo(() => {
-    return (
-      <div 
-        className="admin-login-overlay ultra-stable"
-        onMouseDown={(e) => {
-          if (e.target === e.currentTarget) {
-            e.preventDefault();
-            handleStableCloseLogin();
-          }
-        }}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            e.preventDefault();
-            handleStableCloseLogin();
-          }
-        }}
-      >
-        <div 
-          className="admin-login ultra-stable" 
-          onMouseDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          <div className="admin-login-header ultra-stable">
-            <h2>🔐 Secure Admin Access</h2>
-            <button 
-              className="admin-close ultra-stable" 
-              onMouseDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleStableCloseLogin();
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleStableCloseLogin();
-              }}
-              type="button"
-            >
-              ✕
-            </button>
-          </div>
-          
-          <form 
-            onSubmit={handleStableAdminLogin} 
-            className="admin-login-form ultra-stable"
-            onMouseDown={(e) => e.stopPropagation()}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="security-info ultra-stable">
-              <div className="security-badge-login">🔒 Enhanced Security Active</div>
-              <p>• Max 3 login attempts</p>
-              <p>• 5-minute lockout on failure</p>
-              <p>• 30-minute session timeout</p>
-            </div>
-
-            <div className="admin-credentials-display ultra-stable">
-              <p><strong>Demo Credentials:</strong></p>
-              <p>Username: admin</p>
-              <p>Password: pandamodz2024</p>
-            </div>
-            
-            <div className="form-group ultra-stable">
-              <label htmlFor="admin-username-ultra">Username:</label>
-              <input
-                id="admin-username-ultra"
-                type="text"
-                value={stableUsername}
-                onChange={handleUsernameInput}
-                onInput={handleUsernameInput}
-                onFocus={(e) => {
-                  e.stopPropagation();
-                }}
-                onBlur={(e) => {
-                  e.stopPropagation();
-                  setLoginUsername(e.target.value);
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                }}
-                onKeyDown={(e) => {
-                  e.stopPropagation();
-                }}
-                onKeyUp={(e) => {
-                  e.stopPropagation();
-                }}
-                placeholder="Enter admin username"
-                required
-                autoComplete="username"
-                maxLength="50"
-                disabled={isLocked}
-                className="ultra-stable-input"
-                spellCheck="false"
-                autoCorrect="off"
-                autoCapitalize="off"
-              />
-            </div>
-            
-            <div className="form-group ultra-stable">
-              <label htmlFor="admin-password-ultra">Password:</label>
-              <input
-                id="admin-password-ultra"
-                type="password"
-                value={stablePassword}
-                onChange={handlePasswordInput}
-                onInput={handlePasswordInput}
-                onFocus={(e) => {
-                  e.stopPropagation();
-                }}
-                onBlur={(e) => {
-                  e.stopPropagation();
-                  setLoginPassword(e.target.value);
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                }}
-                onKeyDown={(e) => {
-                  e.stopPropagation();
-                }}
-                onKeyUp={(e) => {
-                  e.stopPropagation();
-                }}
-                placeholder="Enter admin password"
-                required
-                autoComplete="current-password"
-                maxLength="50"
-                disabled={isLocked}
-                className="ultra-stable-input"
-                spellCheck="false"
-                autoCorrect="off"
-                autoCapitalize="off"
-              />
-            </div>
-
-            {isLocked && (
-              <div className="lockout-warning ultra-stable">
-                🔒 Account temporarily locked. Time remaining: {Math.ceil((lockoutTime - Date.now()) / 1000 / 60)} minutes
-              </div>
-            )}
-            
-            {loginError && <div className="admin-error ultra-stable">{loginError}</div>}
-            
-            <button 
-              type="submit" 
-              className="admin-login-btn ultra-stable" 
-              disabled={isLocked}
-              onMouseDown={(e) => e.stopPropagation()}
-              onClick={(e) => e.stopPropagation()}
-            >
-              🚀 Secure Login
-            </button>
-            
-            <div className="quick-login ultra-stable">
-              <button 
-                type="button" 
-                className="quick-login-btn ultra-stable"
-                onClick={handleStableQuickFill}
-                onMouseDown={(e) => e.stopPropagation()}
-                disabled={isLocked}
-              >
-                🔑 Quick Fill Demo Credentials
-              </button>
-              
-              <button 
-                type="button" 
-                className="instant-login-btn ultra-stable"
-                onClick={handleStableInstantAccess}
-                onMouseDown={(e) => e.stopPropagation()}
-                disabled={isLocked}
-              >
-                ⚡ Demo Access (Bypass Login)
-              </button>
-            </div>
-          </form>
-          
-          <div className="admin-help ultra-stable">
-            <p>🔒 Secured with enterprise-grade protection</p>
-          </div>
-        </div>
-      </div>
-    );
-  });
-
-  // Enhanced interactive features
-  const [showDownloadModal, setShowDownloadModal] = useState(false);
-  const [selectedMod, setSelectedMod] = useState(null);
-  const [downloadCount, setDownloadCount] = useState(89452);
-  const [onlineUsers, setOnlineUsers] = useState(1847);
-  const [showToast, setShowToast] = useState(null);
-  const [isTypingEffect, setIsTypingEffect] = useState(true);
-  const [typedText, setTypedText] = useState('');
-  const [currentServiceIndex, setCurrentServiceIndex] = useState(0);
-
-  // Typing effect for hero title
-  const heroTexts = [
-    'ELEVATE YOUR GAMING EXPERIENCE',
-    'UNLOCK NEW POSSIBILITIES',
-    'ENHANCE YOUR GAMEPLAY',
-    'MASTER YOUR GAMES'
-  ];
-
-  useEffect(() => {
-    if (isTypingEffect) {
-      let currentText = heroTexts[currentServiceIndex];
-      let index = 0;
-      
-      const typingInterval = setInterval(() => {
-        if (index <= currentText.length) {
-          setTypedText(currentText.slice(0, index));
-          index++;
-        } else {
-          clearInterval(typingInterval);
-          setTimeout(() => {
-            setCurrentServiceIndex((prev) => (prev + 1) % heroTexts.length);
-            setTypedText('');
-          }, 2000);
-        }
-      }, 100);
-
-      return () => clearInterval(typingInterval);
-    }
-  }, [currentServiceIndex, isTypingEffect]);
-
-  // Real-time counter updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDownloadCount(prev => prev + Math.floor(Math.random() * 3));
-      setOnlineUsers(prev => prev + Math.floor((Math.random() - 0.5) * 10));
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Toast notification system
-  const showToastMessage = useCallback((message, type = 'success') => {
-    setShowToast({ message, type, id: Date.now() });
-    setTimeout(() => setShowToast(null), 3000);
-  }, []);
-
-  // Enhanced mod data with download functionality
-  const modData = [
-    {
-      id: 'trainer-pack-1',
-      title: 'Ultimate Trainer Pack',
-      description: 'Comprehensive collection of game trainers for 50+ popular titles',
-      downloads: 25847,
-      rating: 4.9,
-      category: 'Trainers',
-      image: 'https://images.unsplash.com/photo-1656662961786-b04873ceb4b9',
-      features: ['50+ Game Support', 'Auto-Update', 'Safe & Secure', 'One-Click Install'],
-      fileSize: '12.5 MB',
-      version: '2.1.0'
-    },
-    {
-      id: 'script-collection',
-      title: 'Advanced Script Collection',
-      description: 'Powerful automation scripts for enhanced gameplay experience',
-      downloads: 18923,
-      rating: 4.8,
-      category: 'Scripts',
-      image: 'https://images.unsplash.com/photo-1612404475557-369522ece36f',
-      features: ['Auto-Farm Scripts', 'Quality of Life', 'Customizable', 'Regular Updates'],
-      fileSize: '8.7 MB',
-      version: '1.8.5'
-    },
-    {
-      id: 'quality-tools',
-      title: 'Developer Tools Suite',
-      description: 'Professional-grade tools for game modification and development',
-      downloads: 12456,
-      rating: 4.7,
-      category: 'Tools',
-      image: 'https://images.pexels.com/photos/8728559/pexels-photo-8728559.jpeg',
-      features: ['Memory Editor', 'Process Monitor', 'Code Injection', 'Debug Tools'],
-      fileSize: '45.2 MB',
-      version: '3.0.1'
-    }
-  ];
-
-  // Download modal component
-  const DownloadModal = () => {
-    if (!showDownloadModal || !selectedMod) return null;
-
-    return (
-      <div className="download-modal-overlay" onClick={() => setShowDownloadModal(false)}>
-        <div className="download-modal" onClick={(e) => e.stopPropagation()}>
-          <div className="modal-header">
-            <h3>📦 Download {selectedMod.title}</h3>
-            <button className="modal-close" onClick={() => setShowDownloadModal(false)}>✕</button>
-          </div>
-          
-          <div className="modal-content">
-            <div className="mod-preview">
-              <img src={selectedMod.image} alt={selectedMod.title} />
-              <div className="mod-info">
-                <h4>{selectedMod.title}</h4>
-                <p>{selectedMod.description}</p>
-                <div className="mod-stats">
-                  <span className="stat">
-                    <span className="stat-icon">⭐</span>
-                    <span>{selectedMod.rating}/5</span>
-                  </span>
-                  <span className="stat">
-                    <span className="stat-icon">⬇️</span>
-                    <span>{selectedMod.downloads.toLocaleString()}</span>
-                  </span>
-                  <span className="stat">
-                    <span className="stat-icon">📁</span>
-                    <span>{selectedMod.fileSize}</span>
-                  </span>
-                  <span className="stat">
-                    <span className="stat-icon">🔢</span>
-                    <span>v{selectedMod.version}</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mod-features">
-              <h5>📋 Features:</h5>
-              <ul>
-                {selectedMod.features.map((feature, index) => (
-                  <li key={index}>✅ {feature}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="download-section">
-              <div className="download-warning">
-                <h5>⚠️ Important Notice:</h5>
-                <p>• Only use mods in single-player games</p>
-                <p>• Always backup your save files</p>
-                <p>• Disable antivirus temporarily during installation</p>
-                <p>• Join our Discord for support</p>
-              </div>
-
-              <div className="download-actions">
-                <button 
-                  className="download-btn primary"
-                  onClick={() => {
-                    setDownloadCount(prev => prev + 1);
-                    showToastMessage(`${selectedMod.title} download started!`);
-                    setShowDownloadModal(false);
-                  }}
-                >
-                  🚀 Download Now
-                </button>
-                <button className="download-btn secondary">
-                  📖 View Documentation
-                </button>
-                <a 
-                  href="https://discord.com/invite/sYT5UXkv7F" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="download-btn discord"
-                >
-                  💬 Get Support
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Toast notification component
-  const ToastNotification = () => {
-    if (!showToast) return null;
-
-    return (
-      <div className={`toast-notification ${showToast.type}`}>
-        <div className="toast-content">
-          <span className="toast-icon">
-            {showToast.type === 'success' ? '✅' : showToast.type === 'warning' ? '⚠️' : 'ℹ️'}
-          </span>
-          <span className="toast-message">{showToast.message}</span>
-        </div>
-        <button className="toast-close" onClick={() => setShowToast(null)}>✕</button>
-      </div>
-    );
-  };
-
-  // Live stats component
-  const LiveStats = () => (
-    <div className="live-stats">
-      <div className="stat-item">
-        <span className="stat-number">{downloadCount.toLocaleString()}</span>
-        <span className="stat-label">Total Downloads</span>
-        <span className="stat-indicator">📈</span>
-      </div>
-      <div className="stat-item">
-        <span className="stat-number">{onlineUsers.toLocaleString()}</span>
-        <span className="stat-label">Online Users</span>
-        <span className="stat-indicator online">🟢</span>
-      </div>
-      <div className="stat-item">
-        <span className="stat-number">99.9%</span>
-        <span className="stat-label">Uptime</span>
-        <span className="stat-indicator">⚡</span>
-      </div>
-    </div>
-  );
-
+  // Services data
   const services = [
     {
       icon: '🎮',
@@ -887,354 +273,44 @@ const App = () => {
     }
   ];
 
-  // Security Warning Component
-  const SecurityWarning = () => (
-    <div className="security-warning">
-      <div className="security-warning-content">
-        <h3>🔒 Security Notice</h3>
-        <p>Your admin session will expire in 30 seconds due to inactivity.</p>
-        <button onClick={() => setShowSecurityWarning(false)}>Continue Session</button>
-      </div>
-    </div>
-  );
-
-  // Enhanced admin data with real-time updates
-  const [adminData, setAdminData] = useState({
-    totalVisitors: 15847,
-    todayVisitors: 324,
-    totalDownloads: 89452,
-    activeUsers: 1847,
-    serverStatus: 'online',
-    cpuUsage: 34,
-    memoryUsage: 67,
-    storageUsage: 45,
-    uptime: '7d 14h 23m',
-    lastBackup: '2 hours ago',
-    version: 'v2.1.0'
-  });
-
-  // Enhanced notification system
-  const [notifications, setNotifications] = useState([
-    { id: 1, type: 'success', message: 'System backup completed successfully', time: '2 min ago' },
-    { id: 2, type: 'info', message: 'New user registered from Discord', time: '5 min ago' },
-    { id: 3, type: 'warning', message: 'High memory usage detected', time: '12 min ago' }
-  ]);
-
-  // Real-time data simulation
-  useEffect(() => {
-    if (isAdminLoggedIn && showAdminPanel) {
-      const interval = setInterval(() => {
-        setAdminData(prev => ({
-          ...prev,
-          cpuUsage: Math.max(15, Math.min(85, prev.cpuUsage + (Math.random() - 0.5) * 10)),
-          memoryUsage: Math.max(40, Math.min(90, prev.memoryUsage + (Math.random() - 0.5) * 8)),
-          storageUsage: Math.max(30, Math.min(95, prev.storageUsage + (Math.random() - 0.5) * 5)),
-          activeUsers: Math.max(1500, Math.min(2500, prev.activeUsers + Math.floor((Math.random() - 0.5) * 20))),
-          todayVisitors: prev.todayVisitors + Math.floor(Math.random() * 3)
-        }));
-      }, 3000);
-
-      return () => clearInterval(interval);
-    }
-  }, [isAdminLoggedIn, showAdminPanel]);
-
-  // Add notification function
-  const addNotification = useCallback((type, message) => {
-    const newNotification = {
-      id: Date.now(),
-      type,
-      message,
-      time: 'Just now'
-    };
-    setNotifications(prev => [newNotification, ...prev.slice(0, 4)]);
-  }, []);
-
-  // Enhanced Admin Panel with tabs and advanced features
+  // Admin Panel Component
   const AdminPanel = () => {
-    const renderTabContent = () => {
-      switch(activeAdminTab) {
-  // Enhanced admin data with real-time updates
-  const [adminData, setAdminData] = useState({
-    totalVisitors: 15847,
-    todayVisitors: 324,
-    totalDownloads: 89452,
-    activeUsers: 1847,
-    serverStatus: 'online',
-    cpuUsage: 34,
-    memoryUsage: 67,
-    storageUsage: 45,
-    uptime: '7d 14h 23m',
-    lastBackup: '2 hours ago',
-    version: 'v2.1.0'
-  });
-
-  // Real-time data simulation
-  useEffect(() => {
-    if (isAdminLoggedIn && showAdminPanel) {
-      const interval = setInterval(() => {
-        setAdminData(prev => ({
-          ...prev,
-          cpuUsage: Math.max(15, Math.min(85, prev.cpuUsage + (Math.random() - 0.5) * 10)),
-          memoryUsage: Math.max(40, Math.min(90, prev.memoryUsage + (Math.random() - 0.5) * 8)),
-          storageUsage: Math.max(30, Math.min(95, prev.storageUsage + (Math.random() - 0.5) * 5)),
-          activeUsers: Math.max(1500, Math.min(2500, prev.activeUsers + Math.floor((Math.random() - 0.5) * 20))),
-          todayVisitors: prev.todayVisitors + Math.floor(Math.random() * 3)
-        }));
-      }, 3000);
-
-      return () => clearInterval(interval);
-    }
-  }, [isAdminLoggedIn, showAdminPanel]);
-
-  // Enhanced notification system
-  const [notifications, setNotifications] = useState([
-    { id: 1, type: 'success', message: 'System backup completed successfully', time: '2 min ago' },
-    { id: 2, type: 'info', message: 'New user registered from Discord', time: '5 min ago' },
-    { id: 3, type: 'warning', message: 'High memory usage detected', time: '12 min ago' }
-  ]);
-
-  // Add notification function
-  const addNotification = useCallback((type, message) => {
-    const newNotification = {
-      id: Date.now(),
-      type,
-      message,
-      time: 'Just now'
-    };
-    setNotifications(prev => [newNotification, ...prev.slice(0, 4)]);
-  }, []);
-
-  // Enhanced admin panel with notifications and real-time features
-  const AdminPanel = () => {
-    const [showNotifications, setShowNotifications] = useState(false);
-    
     const renderTabContent = () => {
       switch(activeAdminTab) {
         case 'dashboard':
           return (
             <div className="admin-dashboard">
-              {/* Real-time Status Bar */}
-              <div className="status-bar">
-                <div className="status-item">
-                  <span className="status-icon online">🟢</span>
-                  <span>System Online</span>
-                </div>
-                <div className="status-item">
-                  <span className="status-icon">⏱️</span>
-                  <span>Uptime: {adminData.uptime}</span>
-                </div>
-                <div className="status-item">
-                  <span className="status-icon">📊</span>
-                  <span>CPU: {adminData.cpuUsage.toFixed(1)}%</span>
-                </div>
-                <div className="status-item">
-                  <span className="status-icon">💾</span>
-                  <span>RAM: {adminData.memoryUsage.toFixed(1)}%</span>
-                </div>
-                <div className="status-item">
-                  <span className="status-icon">💿</span>
-                  <span>Storage: {adminData.storageUsage.toFixed(1)}%</span>
-                </div>
-              </div>
-
-              {/* Enhanced Key Metrics */}
               <div className="metrics-row">
-                <div className="metric-card primary animated">
+                <div className="metric-card primary">
                   <div className="metric-icon">👥</div>
                   <div className="metric-content">
                     <h3>{adminData.totalVisitors.toLocaleString()}</h3>
                     <p>Total Visitors</p>
                     <span className="metric-change positive">+12.5%</span>
                   </div>
-                  <div className="metric-sparkline">
-                    <div className="sparkline-bar" style={{height: '60%'}}></div>
-                    <div className="sparkline-bar" style={{height: '80%'}}></div>
-                    <div className="sparkline-bar" style={{height: '45%'}}></div>
-                    <div className="sparkline-bar" style={{height: '90%'}}></div>
-                    <div className="sparkline-bar" style={{height: '70%'}}></div>
-                  </div>
                 </div>
-                <div className="metric-card success animated">
+                <div className="metric-card success">
                   <div className="metric-icon">⬇️</div>
                   <div className="metric-content">
                     <h3>{adminData.totalDownloads.toLocaleString()}</h3>
                     <p>Total Downloads</p>
                     <span className="metric-change positive">+8.3%</span>
                   </div>
-                  <div className="metric-trend">📈</div>
                 </div>
-                <div className="metric-card warning animated">
+                <div className="metric-card warning">
                   <div className="metric-icon">🟢</div>
                   <div className="metric-content">
                     <h3>{adminData.activeUsers.toLocaleString()}</h3>
                     <p>Active Users</p>
                     <span className="metric-change positive">+15.7%</span>
                   </div>
-                  <div className="metric-pulse"></div>
                 </div>
-                <div className="metric-card info animated">
+                <div className="metric-card info">
                   <div className="metric-icon">📊</div>
                   <div className="metric-content">
                     <h3>{adminData.todayVisitors}</h3>
                     <p>Today's Visitors</p>
                     <span className="metric-change positive">+23.1%</span>
-                  </div>
-                  <div className="metric-counter">+{Math.floor(Math.random() * 5) + 1}</div>
-                </div>
-              </div>
-
-              {/* Enhanced Charts Row */}
-              <div className="charts-row">
-                <div className="chart-card enhanced">
-                  <div className="chart-header">
-                    <h3>📈 Traffic Analytics</h3>
-                    <div className="chart-controls">
-                      <button className="chart-btn active">7D</button>
-                      <button className="chart-btn">30D</button>
-                      <button className="chart-btn">90D</button>
-                    </div>
-                  </div>
-                  <div className="chart-placeholder">
-                    <div className="chart-bars">
-                      <div className="bar animated" style={{height: '60%', animationDelay: '0.1s'}}><span>Mon</span></div>
-                      <div className="bar animated" style={{height: '80%', animationDelay: '0.2s'}}><span>Tue</span></div>
-                      <div className="bar animated" style={{height: '45%', animationDelay: '0.3s'}}><span>Wed</span></div>
-                      <div className="bar animated" style={{height: '90%', animationDelay: '0.4s'}}><span>Thu</span></div>
-                      <div className="bar animated" style={{height: '70%', animationDelay: '0.5s'}}><span>Fri</span></div>
-                      <div className="bar animated" style={{height: '85%', animationDelay: '0.6s'}}><span>Sat</span></div>
-                      <div className="bar animated" style={{height: '95%', animationDelay: '0.7s'}}><span>Sun</span></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="chart-card enhanced">
-                  <div className="chart-header">
-                    <h3>🎯 Popular Content</h3>
-                    <div className="refresh-indicator">🔄</div>
-                  </div>
-                  <div className="content-list">
-                    <div className="content-item enhanced">
-                      <span className="content-name">Advanced Trainers</span>
-                      <div className="progress-bar">
-                        <div className="progress animated" style={{width: '85%', animationDelay: '0.1s'}}></div>
-                      </div>
-                      <span className="content-value">85%</span>
-                    </div>
-                    <div className="content-item enhanced">
-                      <span className="content-name">Script Mods</span>
-                      <div className="progress-bar">
-                        <div className="progress animated" style={{width: '72%', animationDelay: '0.2s'}}></div>
-                      </div>
-                      <span className="content-value">72%</span>
-                    </div>
-                    <div className="content-item enhanced">
-                      <span className="content-name">Video Tutorials</span>
-                      <div className="progress-bar">
-                        <div className="progress animated" style={{width: '68%', animationDelay: '0.3s'}}></div>
-                      </div>
-                      <span className="content-value">68%</span>
-                    </div>
-                    <div className="content-item enhanced">
-                      <span className="content-name">Quality Tools</span>
-                      <div className="progress-bar">
-                        <div className="progress animated" style={{width: '59%', animationDelay: '0.4s'}}></div>
-                      </div>
-                      <span className="content-value">59%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Enhanced Status Row */}
-              <div className="status-row">
-                <div className="status-card enhanced">
-                  <h3>🖥️ System Performance</h3>
-                  <div className="performance-metrics">
-                    <div className="perf-item enhanced">
-                      <span>CPU Usage</span>
-                      <div className="perf-bar">
-                        <div className="perf-fill cpu animated" style={{width: `${adminData.cpuUsage}%`}}></div>
-                      </div>
-                      <span className="perf-value">{adminData.cpuUsage.toFixed(1)}%</span>
-                    </div>
-                    <div className="perf-item enhanced">
-                      <span>Memory</span>
-                      <div className="perf-bar">
-                        <div className="perf-fill memory animated" style={{width: `${adminData.memoryUsage}%`}}></div>
-                      </div>
-                      <span className="perf-value">{adminData.memoryUsage.toFixed(1)}%</span>
-                    </div>
-                    <div className="perf-item enhanced">
-                      <span>Storage</span>
-                      <div className="perf-bar">
-                        <div className="perf-fill storage animated" style={{width: `${adminData.storageUsage}%`}}></div>
-                      </div>
-                      <span className="perf-value">{adminData.storageUsage.toFixed(1)}%</span>
-                    </div>
-                  </div>
-                  <div className="performance-actions">
-                    <button className="perf-action-btn" onClick={() => addNotification('info', 'System optimization started')}>
-                      🚀 Optimize
-                    </button>
-                    <button className="perf-action-btn" onClick={() => addNotification('success', 'Cache cleared successfully')}>
-                      🧹 Clear Cache
-                    </button>
-                  </div>
-                </div>
-                <div className="status-card enhanced">
-                  <h3>⚡ Quick Actions</h3>
-                  <div className="quick-actions-grid">
-                    <button className="quick-action enhanced" onClick={() => addNotification('info', 'Creating new post...')}>
-                      <span className="qa-icon">📝</span>
-                      <span>New Post</span>
-                    </button>
-                    <button className="quick-action enhanced" onClick={() => setActiveAdminTab('analytics')}>
-                      <span className="qa-icon">📊</span>
-                      <span>Analytics</span>
-                    </button>
-                    <button className="quick-action enhanced" onClick={() => addNotification('info', 'Opening user management...')}>
-                      <span className="qa-icon">👥</span>
-                      <span>Users</span>
-                    </button>
-                    <button className="quick-action enhanced" onClick={() => setActiveAdminTab('system')}>
-                      <span className="qa-icon">⚙️</span>
-                      <span>Settings</span>
-                    </button>
-                    <button className="quick-action enhanced" onClick={() => addNotification('success', 'Backup initiated successfully')}>
-                      <span className="qa-icon">💾</span>
-                      <span>Backup</span>
-                    </button>
-                    <button className="quick-action enhanced" onClick={() => addNotification('warning', 'Checking for updates...')}>
-                      <span className="qa-icon">🔄</span>
-                      <span>Update</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent Activity Feed */}
-              <div className="activity-feed">
-                <h3>📋 Recent Activity</h3>
-                <div className="activity-list">
-                  <div className="activity-item">
-                    <div className="activity-icon success">✅</div>
-                    <div className="activity-content">
-                      <p>User 'GamerPro123' downloaded Advanced Trainer Pack</p>
-                      <span className="activity-time">2 minutes ago</span>
-                    </div>
-                  </div>
-                  <div className="activity-item">
-                    <div className="activity-icon info">📺</div>
-                    <div className="activity-content">
-                      <p>New video tutorial published: "Script Installation Guide"</p>
-                      <span className="activity-time">15 minutes ago</span>
-                    </div>
-                  </div>
-                  <div className="activity-item">
-                    <div className="activity-icon warning">⚠️</div>
-                    <div className="activity-content">
-                      <p>High traffic detected from Discord referrals</p>
-                      <span className="activity-time">32 minutes ago</span>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -1271,28 +347,6 @@ const App = () => {
                     ))}
                   </div>
                 </div>
-
-                <div className="content-section">
-                  <h4>🎮 Services Management</h4>
-                  <div className="content-items">
-                    {services.map((service, index) => (
-                      <div key={index} className="content-item-card">
-                        <div className="content-thumb">
-                          <img src={service.image} alt={service.title} />
-                        </div>
-                        <div className="content-details">
-                          <h5>{service.title}</h5>
-                          <p>{service.description}</p>
-                          <div className="content-actions">
-                            <button className="edit-btn">✏️ Edit</button>
-                            <button className="delete-btn">🗑️ Delete</button>
-                            <button className="featured-btn">⭐ Feature</button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
             </div>
           );
@@ -1302,15 +356,7 @@ const App = () => {
             <div className="admin-analytics">
               <div className="analytics-header">
                 <h3>📊 Advanced Analytics</h3>
-                <div className="date-range">
-                  <select>
-                    <option>Last 7 days</option>
-                    <option>Last 30 days</option>
-                    <option>Last 90 days</option>
-                  </select>
-                </div>
               </div>
-
               <div className="analytics-grid">
                 <div className="analytics-card">
                   <h4>🌍 Geographic Distribution</h4>
@@ -1321,88 +367,6 @@ const App = () => {
                         <div className="geo-fill" style={{width: '65%'}}></div>
                       </div>
                       <span>65%</span>
-                    </div>
-                    <div className="geo-item">
-                      <span className="country">🇬🇧 United Kingdom</span>
-                      <div className="geo-bar">
-                        <div className="geo-fill" style={{width: '12%'}}></div>
-                      </div>
-                      <span>12%</span>
-                    </div>
-                    <div className="geo-item">
-                      <span className="country">🇩🇪 Germany</span>
-                      <div className="geo-bar">
-                        <div className="geo-fill" style={{width: '8%'}}></div>
-                      </div>
-                      <span>8%</span>
-                    </div>
-                    <div className="geo-item">
-                      <span className="country">🇨🇦 Canada</span>
-                      <div className="geo-bar">
-                        <div className="geo-fill" style={{width: '7%'}}></div>
-                      </div>
-                      <span>7%</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="analytics-card">
-                  <h4>📱 Device Analytics</h4>
-                  <div className="device-stats">
-                    <div className="device-chart">
-                      <div className="device-slice desktop" style={{'--percentage': '58%'}}>
-                        <span>Desktop 58%</span>
-                      </div>
-                      <div className="device-slice mobile" style={{'--percentage': '32%'}}>
-                        <span>Mobile 32%</span>
-                      </div>
-                      <div className="device-slice tablet" style={{'--percentage': '10%'}}>
-                        <span>Tablet 10%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="analytics-card">
-                  <h4>🔗 Referral Sources</h4>
-                  <div className="referral-list">
-                    <div className="referral-item">
-                      <span className="referral-source">🔍 Google Search</span>
-                      <span className="referral-count">2,847</span>
-                    </div>
-                    <div className="referral-item">
-                      <span className="referral-source">📺 YouTube</span>
-                      <span className="referral-count">1,423</span>
-                    </div>
-                    <div className="referral-item">
-                      <span className="referral-source">💬 Discord</span>
-                      <span className="referral-count">987</span>
-                    </div>
-                    <div className="referral-item">
-                      <span className="referral-source">🐦 Twitter</span>
-                      <span className="referral-count">654</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="analytics-card">
-                  <h4>⏱️ User Engagement</h4>
-                  <div className="engagement-metrics">
-                    <div className="engagement-item">
-                      <span className="metric-label">Avg. Session</span>
-                      <span className="metric-value">4:23</span>
-                    </div>
-                    <div className="engagement-item">
-                      <span className="metric-label">Bounce Rate</span>
-                      <span className="metric-value">23.4%</span>
-                    </div>
-                    <div className="engagement-item">
-                      <span className="metric-label">Pages/Session</span>
-                      <span className="metric-value">3.7</span>
-                    </div>
-                    <div className="engagement-item">
-                      <span className="metric-label">Return Visitors</span>
-                      <span className="metric-value">67%</span>
                     </div>
                   </div>
                 </div>
@@ -1417,7 +381,6 @@ const App = () => {
                 <h3>🔒 Security Center</h3>
                 <div className="security-status online">🟢 All Systems Secure</div>
               </div>
-
               <div className="security-sections">
                 <div className="security-section">
                   <h4>🛡️ Security Overview</h4>
@@ -1429,80 +392,6 @@ const App = () => {
                         <p>{loginAttempts}/3 failed attempts</p>
                       </div>
                       <div className="security-status-indicator success"></div>
-                    </div>
-                    <div className="security-metric">
-                      <span className="security-icon">⏰</span>
-                      <div className="security-info">
-                        <h5>Session Status</h5>
-                        <p>Active for {Math.floor((Date.now() - (sessionExpiry - SESSION_DURATION)) / 1000 / 60)} minutes</p>
-                      </div>
-                      <div className="security-status-indicator success"></div>
-                    </div>
-                    <div className="security-metric">
-                      <span className="security-icon">🌐</span>
-                      <div className="security-info">
-                        <h5>IP Address</h5>
-                        <p>127.0.0.1 (Localhost)</p>
-                      </div>
-                      <div className="security-status-indicator success"></div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="security-section">
-                  <h4>📋 Security Log</h4>
-                  <div className="security-log">
-                    <div className="log-item success">
-                      <span className="log-time">{new Date().toLocaleTimeString()}</span>
-                      <span className="log-message">Admin login successful</span>
-                      <span className="log-ip">127.0.0.1</span>
-                    </div>
-                    <div className="log-item info">
-                      <span className="log-time">{new Date(Date.now() - 300000).toLocaleTimeString()}</span>
-                      <span className="log-message">Session started</span>
-                      <span className="log-ip">127.0.0.1</span>
-                    </div>
-                    <div className="log-item warning">
-                      <span className="log-time">{new Date(Date.now() - 600000).toLocaleTimeString()}</span>
-                      <span className="log-message">Failed login attempt</span>
-                      <span className="log-ip">192.168.1.100</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="security-section">
-                  <h4>⚙️ Security Settings</h4>
-                  <div className="security-settings">
-                    <div className="setting-item">
-                      <div className="setting-info">
-                        <h5>Two-Factor Authentication</h5>
-                        <p>Add an extra layer of security</p>
-                      </div>
-                      <div className="setting-toggle">
-                        <input type="checkbox" id="2fa" />
-                        <label htmlFor="2fa" className="toggle-switch"></label>
-                      </div>
-                    </div>
-                    <div className="setting-item">
-                      <div className="setting-info">
-                        <h5>Session Timeout</h5>
-                        <p>Automatically logout after inactivity</p>
-                      </div>
-                      <select className="setting-select">
-                        <option>15 minutes</option>
-                        <option selected>30 minutes</option>
-                        <option>1 hour</option>
-                      </select>
-                    </div>
-                    <div className="setting-item">
-                      <div className="setting-info">
-                        <h5>Login Notifications</h5>
-                        <p>Get notified of new login attempts</p>
-                      </div>
-                      <div className="setting-toggle">
-                        <input type="checkbox" id="notifications" checked />
-                        <label htmlFor="notifications" className="toggle-switch"></label>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -1517,7 +406,6 @@ const App = () => {
                 <h3>⚙️ System Management</h3>
                 <div className="system-status online">🟢 All Systems Operational</div>
               </div>
-
               <div className="system-sections">
                 <div className="system-section">
                   <h4>📊 System Resources</h4>
@@ -1531,82 +419,6 @@ const App = () => {
                       <div className="resource-bar">
                         <div className="resource-fill cpu" style={{width: `${adminData.cpuUsage}%`}}></div>
                       </div>
-                    </div>
-                    <div className="resource-monitor">
-                      <div className="resource-header">
-                        <span className="resource-icon">💾</span>
-                        <h5>Memory Usage</h5>
-                        <span className="resource-value">{adminData.memoryUsage}%</span>
-                      </div>
-                      <div className="resource-bar">
-                        <div className="resource-fill memory" style={{width: `${adminData.memoryUsage}%`}}></div>
-                      </div>
-                    </div>
-                    <div className="resource-monitor">
-                      <div className="resource-header">
-                        <span className="resource-icon">💿</span>
-                        <h5>Storage Usage</h5>
-                        <span className="resource-value">{adminData.storageUsage}%</span>
-                      </div>
-                      <div className="resource-bar">
-                        <div className="resource-fill storage" style={{width: `${adminData.storageUsage}%`}}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="system-section">
-                  <h4>🔧 System Actions</h4>
-                  <div className="system-actions-grid">
-                    <button className="system-action primary">
-                      <span className="action-icon">💾</span>
-                      <div className="action-info">
-                        <h5>Create Backup</h5>
-                        <p>Full system backup</p>
-                      </div>
-                    </button>
-                    <button className="system-action warning">
-                      <span className="action-icon">🔄</span>
-                      <div className="action-info">
-                        <h5>Clear Cache</h5>
-                        <p>Clear all cached data</p>
-                      </div>
-                    </button>
-                    <button className="system-action info">
-                      <span className="action-icon">🔍</span>
-                      <div className="action-info">
-                        <h5>System Scan</h5>
-                        <p>Check for issues</p>
-                      </div>
-                    </button>
-                    <button className="system-action success">
-                      <span className="action-icon">⬆️</span>
-                      <div className="action-info">
-                        <h5>Update System</h5>
-                        <p>Install latest updates</p>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="system-section">
-                  <h4>📋 System Information</h4>
-                  <div className="system-info-grid">
-                    <div className="info-item">
-                      <span className="info-label">Version</span>
-                      <span className="info-value">v2.1.0</span>
-                    </div>
-                    <div className="info-item">
-                      <span className="info-label">Uptime</span>
-                      <span className="info-value">7d 14h 23m</span>
-                    </div>
-                    <div className="info-item">
-                      <span className="info-label">Database</span>
-                      <span className="info-value">Connected</span>
-                    </div>
-                    <div className="info-item">
-                      <span className="info-label">Last Backup</span>
-                      <span className="info-value">2 hours ago</span>
                     </div>
                   </div>
                 </div>
@@ -1634,7 +446,6 @@ const App = () => {
                   {sessionExpiry ? Math.floor((sessionExpiry - Date.now()) / 1000 / 60) : 30}m left
                 </span>
               </div>
-              <button className="admin-minimize">−</button>
               <button className="admin-close" onClick={() => setShowAdminPanel(false)}>✕</button>
             </div>
           </div>
@@ -1692,12 +503,126 @@ const App = () => {
     );
   };
 
+  // Admin Login Component
+  const AdminLogin = () => (
+    <div className="admin-login-overlay" onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowAdminLogin(false);
+      }
+    }}>
+      <div className="admin-login" onClick={(e) => e.stopPropagation()}>
+        <div className="admin-login-header">
+          <h2>🔐 Secure Admin Access</h2>
+          <button className="admin-close" onClick={() => setShowAdminLogin(false)}>✕</button>
+        </div>
+        
+        <form onSubmit={handleAdminLogin} className="admin-login-form">
+          <div className="admin-credentials-display">
+            <p><strong>Demo Credentials:</strong></p>
+            <p>Username: admin</p>
+            <p>Password: pandamodz2024</p>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="admin-username">Username:</label>
+            <input
+              id="admin-username"
+              type="text"
+              value={loginUsername}
+              onChange={(e) => setLoginUsername(e.target.value)}
+              placeholder="Enter admin username"
+              required
+              autoComplete="username"
+              maxLength="50"
+              disabled={isLocked}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="admin-password">Password:</label>
+            <input
+              id="admin-password"
+              type="password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              placeholder="Enter admin password"
+              required
+              autoComplete="current-password"
+              maxLength="50"
+              disabled={isLocked}
+            />
+          </div>
 
+          {isLocked && (
+            <div className="lockout-warning">
+              🔒 Account temporarily locked. Time remaining: {Math.ceil((lockoutTime - Date.now()) / 1000 / 60)} minutes
+            </div>
+          )}
+          
+          {loginError && <div className="admin-error">{loginError}</div>}
+          
+          <button type="submit" className="admin-login-btn" disabled={isLocked}>
+            🚀 Secure Login
+          </button>
+          
+          <div className="quick-login">
+            <button 
+              type="button" 
+              className="quick-login-btn"
+              onClick={() => {
+                setLoginUsername('admin');
+                setLoginPassword('pandamodz2024');
+              }}
+              disabled={isLocked}
+            >
+              🔑 Quick Fill Demo Credentials
+            </button>
+            
+            <button 
+              type="button" 
+              className="instant-login-btn"
+              onClick={() => {
+                if (!isLocked) {
+                  const currentTime = Date.now();
+                  const expiryTime = currentTime + SESSION_DURATION;
+                  
+                  setIsAdminLoggedIn(true);
+                  setShowAdminLogin(false);
+                  setShowAdminPanel(true);
+                  setLoginError('');
+                  setSessionExpiry(expiryTime);
+                  
+                  localStorage.setItem('pandaAdminSession', 'true');
+                  localStorage.setItem('pandaSessionTime', currentTime.toString());
+                  startSessionTimer(SESSION_DURATION);
+                }
+              }}
+              disabled={isLocked}
+            >
+              ⚡ Demo Access (Bypass Login)
+            </button>
+          </div>
+        </form>
+        
+        <div className="admin-help">
+          <p>🔒 Secured with enterprise-grade protection</p>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="app">
       {/* Security Warning */}
-      {showSecurityWarning && <SecurityWarning />}
+      {showSecurityWarning && (
+        <div className="security-warning">
+          <div className="security-warning-content">
+            <h3>🔒 Security Notice</h3>
+            <p>Your admin session will expire in 30 seconds due to inactivity.</p>
+            <button onClick={() => setShowSecurityWarning(false)}>Continue Session</button>
+          </div>
+        </div>
+      )}
 
       {/* Admin Access Button */}
       <button 
@@ -1879,31 +804,7 @@ const App = () => {
                 <div className="showcase-content">
                   <h3 className="showcase-title">{item.title}</h3>
                   <p className="showcase-description">{item.description}</p>
-                  <button 
-                    className="enhanced-showcase-button"
-                    onClick={() => {
-                      // Simulate download functionality
-                      const downloads = [
-                        'Advanced Trainer Pack v2.1.0.zip',
-                        'Script Collection v1.8.5.zip', 
-                        'Developer Tools Suite v3.0.1.zip'
-                      ];
-                      const randomDownload = downloads[Math.floor(Math.random() * downloads.length)];
-                      
-                      // Show toast notification
-                      const event = new CustomEvent('showToast', {
-                        detail: { 
-                          message: `🚀 Download started: ${randomDownload}`,
-                          type: 'success'
-                        }
-                      });
-                      window.dispatchEvent(event);
-                      
-                      // Increment download counter
-                      const counterEvent = new CustomEvent('incrementDownload');
-                      window.dispatchEvent(counterEvent);
-                    }}
-                  >
+                  <button className="showcase-button">
                     Download Now
                     <span className="download-icon">⬇️</span>
                   </button>
