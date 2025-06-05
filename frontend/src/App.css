@@ -1487,6 +1487,200 @@ body {
   }
 }
 
+/* Ultra Anti-Flickering System */
+.admin-login-overlay.ultra-stable {
+  contain: strict;
+  will-change: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  isolation: isolate;
+}
+
+.admin-login.ultra-stable {
+  contain: strict;
+  will-change: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  isolation: isolate;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-login-header.ultra-stable {
+  contain: layout style;
+  will-change: auto;
+  transform: translateZ(0);
+  isolation: isolate;
+}
+
+.admin-login-form.ultra-stable {
+  contain: layout;
+  isolation: isolate;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.form-group.ultra-stable {
+  contain: layout;
+  will-change: auto;
+  transform: translateZ(0);
+  isolation: isolate;
+  position: relative;
+}
+
+.ultra-stable-input {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 8px !important;
+  padding: 0.75rem !important;
+  color: #ffffff !important;
+  font-size: 1rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  
+  /* Ultra-stability properties */
+  transition: none !important;
+  will-change: auto !important;
+  backface-visibility: hidden !important;
+  transform: translateZ(0) !important;
+  contain: strict !important;
+  outline: none !important;
+  isolation: isolate !important;
+  
+  /* Prevent any visual changes during typing */
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  
+  /* Text rendering optimizations */
+  text-rendering: optimizeSpeed !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  
+  /* Prevent reflows */
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.ultra-stable-input:focus {
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2) !important;
+  transition: none !important;
+}
+
+.ultra-stable-input:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.ultra-stable-input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important;
+}
+
+/* Ultra-stable button states */
+.admin-login-btn.ultra-stable,
+.quick-login-btn.ultra-stable,
+.instant-login-btn.ultra-stable {
+  contain: layout style;
+  will-change: auto;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  isolation: isolate;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-close.ultra-stable {
+  contain: layout style;
+  will-change: auto;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  isolation: isolate;
+}
+
+.admin-error.ultra-stable,
+.lockout-warning.ultra-stable {
+  contain: layout;
+  will-change: auto;
+  transform: translateZ(0);
+  isolation: isolate;
+}
+
+.quick-login.ultra-stable {
+  contain: layout;
+  will-change: auto;
+  transform: translateZ(0);
+  isolation: isolate;
+}
+
+.security-info.ultra-stable,
+.admin-credentials-display.ultra-stable,
+.admin-help.ultra-stable {
+  contain: layout;
+  will-change: auto;
+  transform: translateZ(0);
+  isolation: isolate;
+}
+
+/* Force stable rendering for all child elements */
+.admin-login.ultra-stable * {
+  contain: layout style;
+  will-change: auto;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Prevent any layout shifts */
+.admin-login.ultra-stable h2,
+.admin-login.ultra-stable p,
+.admin-login.ultra-stable label,
+.admin-login.ultra-stable button {
+  contain: layout style;
+  will-change: auto;
+  transform: translateZ(0);
+  isolation: isolate;
+}
+
+/* Text selection stability */
+.admin-login.ultra-stable * {
+  user-select: text;
+}
+
+.admin-login.ultra-stable input {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+}
+
+.admin-login.ultra-stable label,
+.admin-login.ultra-stable button:not(input),
+.admin-login.ultra-stable .admin-credentials-display,
+.admin-login.ultra-stable .security-info,
+.admin-login.ultra-stable .admin-help {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Prevent cursor flickering */
+.ultra-stable-input {
+  caret-color: #8b5cf6 !important;
+}
+
+/* Force repaint stability */
+.admin-login-overlay.ultra-stable,
+.admin-login.ultra-stable {
+  opacity: 0.999999;
+}
+
 /* Anti-Flickering Optimizations */
 .admin-login-overlay.stable {
   contain: layout style;
