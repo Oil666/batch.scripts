@@ -249,6 +249,11 @@ const App = () => {
                 Join Discord Server
                 <span className="member-count">Active Community</span>
               </a>
+              <a href="https://www.youtube.com/@DarkPandax" target="_blank" rel="noopener noreferrer" className="youtube-button">
+                <span className="youtube-logo">📺</span>
+                Subscribe to YouTube
+                <span className="channel-info">Tutorials & Showcases</span>
+              </a>
               <button className="newsletter-button">
                 <span className="newsletter-icon">📧</span>
                 Subscribe for Updates
