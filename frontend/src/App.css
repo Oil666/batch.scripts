@@ -2988,15 +2988,46 @@ body {
 }
 
 /* Form stability improvements */
-.admin-login-form.stable input {
+.admin-login-form.ultra-stable {
+  contain: layout;
+  isolation: isolate;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-login-form.ultra-stable input {
   contain: layout style;
   transform: translateZ(0);
   backface-visibility: hidden;
 }
 
-.admin-login-form.stable label {
+.admin-login-form.ultra-stable label {
   pointer-events: none;
   user-select: none;
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+.form-group.ultra-stable {
+  contain: layout;
+  will-change: auto;
+  transform: translateZ(0);
+  isolation: isolate;
+  position: relative;
+  margin-bottom: 1rem;
+  min-height: 80px; /* Prevent layout shifts */
+}
+
+.form-group.ultra-stable label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.2;
+  contain: layout style;
 }
 
 /* Prevent text selection interference */
