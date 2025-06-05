@@ -226,7 +226,7 @@ const App = () => {
     }
   }, [loginUsername, loginPassword, isLocked, lockoutTime, loginAttempts, sanitizeInput, startSessionTimer, startLockoutTimer]);
 
-  // Optimized input handlers to prevent flickering
+  // Memoized and optimized input handlers to prevent flickering
   const handleUsernameChange = useCallback((e) => {
     const value = e.target.value;
     setLoginUsername(value);
@@ -237,15 +237,16 @@ const App = () => {
     setLoginPassword(value);
   }, []);
 
-  // Quick fill handler
+  // Stable form handlers
   const handleQuickFill = useCallback((e) => {
+    e.preventDefault();
     e.stopPropagation();
     setLoginUsername('admin');
     setLoginPassword('pandamodz2024');
   }, []);
 
-  // Instant access handler
   const handleInstantAccess = useCallback((e) => {
+    e.preventDefault();
     e.stopPropagation();
     if (!isLocked) {
       const currentTime = Date.now();
@@ -264,6 +265,142 @@ const App = () => {
       console.log('[SECURITY] Admin instant access at:', new Date().toISOString());
     }
   }, [isLocked, startSessionTimer]);
+
+  // Stable close handler
+  const handleCloseLogin = useCallback(() => {
+    setShowAdminLogin(false);
+    setLoginError('');
+  }, []);
+
+  // Memoized AdminLogin component to prevent unnecessary re-renders
+  const AdminLogin = React.memo(() => {
+    return (
+      <div 
+        className="admin-login-overlay stable"
+        onMouseDown={(e) => {
+          if (e.target === e.currentTarget) {
+            handleCloseLogin();
+          }
+        }}
+      >
+        <div 
+          className="admin-login stable" 
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="admin-login-header">
+            <h2>🔐 Secure Admin Access</h2>
+            <button 
+              className="admin-close" 
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={handleCloseLogin}
+              type="button"
+            >
+              ✕
+            </button>
+          </div>
+          
+          <form onSubmit={handleAdminLogin} className="admin-login-form stable">
+            <div className="security-info">
+              <div className="security-badge-login">🔒 Enhanced Security Active</div>
+              <p>• Max 3 login attempts</p>
+              <p>• 5-minute lockout on failure</p>
+              <p>• 30-minute session timeout</p>
+            </div>
+
+            <div className="admin-credentials-display">
+              <p><strong>Demo Credentials:</strong></p>
+              <p>Username: admin</p>
+              <p>Password: pandamodz2024</p>
+            </div>
+            
+            <div className="form-group stable">
+              <label htmlFor="admin-username">Username:</label>
+              <input
+                id="admin-username"
+                type="text"
+                value={loginUsername}
+                onChange={handleUsernameChange}
+                onFocus={(e) => e.stopPropagation()}
+                onBlur={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+                placeholder="Enter admin username"
+                required
+                autoComplete="username"
+                maxLength="50"
+                disabled={isLocked}
+                className="stable-input"
+              />
+            </div>
+            
+            <div className="form-group stable">
+              <label htmlFor="admin-password">Password:</label>
+              <input
+                id="admin-password"
+                type="password"
+                value={loginPassword}
+                onChange={handlePasswordChange}
+                onFocus={(e) => e.stopPropagation()}
+                onBlur={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+                placeholder="Enter admin password"
+                required
+                autoComplete="current-password"
+                maxLength="50"
+                disabled={isLocked}
+                className="stable-input"
+              />
+            </div>
+
+            {isLocked && (
+              <div className="lockout-warning stable">
+                🔒 Account temporarily locked. Time remaining: {Math.ceil((lockoutTime - Date.now()) / 1000 / 60)} minutes
+              </div>
+            )}
+            
+            {loginError && <div className="admin-error stable">{loginError}</div>}
+            
+            <button 
+              type="submit" 
+              className="admin-login-btn stable" 
+              disabled={isLocked}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              🚀 Secure Login
+            </button>
+            
+            <div className="quick-login stable">
+              <button 
+                type="button" 
+                className="quick-login-btn stable"
+                onClick={handleQuickFill}
+                onMouseDown={(e) => e.stopPropagation()}
+                disabled={isLocked}
+              >
+                🔑 Quick Fill Demo Credentials
+              </button>
+              
+              <button 
+                type="button" 
+                className="instant-login-btn stable"
+                onClick={handleInstantAccess}
+                onMouseDown={(e) => e.stopPropagation()}
+                disabled={isLocked}
+              >
+                ⚡ Demo Access (Bypass Login)
+              </button>
+            </div>
+          </form>
+          
+          <div className="admin-help">
+            <p>🔒 Secured with enterprise-grade protection</p>
+          </div>
+        </div>
+      </div>
+    );
+  });
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
