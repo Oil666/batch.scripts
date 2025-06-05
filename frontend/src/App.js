@@ -295,6 +295,7 @@ const App = () => {
               <div className="footer-column">
                 <h4>Community</h4>
                 <ul>
+                  <li><a href="https://www.youtube.com/@DarkPandax" target="_blank" rel="noopener noreferrer">YouTube Channel</a></li>
                   <li><a href="https://discord.com/invite/sYT5UXkv7F" target="_blank" rel="noopener noreferrer">Discord Server</a></li>
                   <li><a href="#showcase">Download Center</a></li>
                   <li><a href="#community">Support</a></li>
