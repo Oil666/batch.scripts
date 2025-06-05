@@ -505,25 +505,25 @@ const App = () => {
 
   // Admin Login Component
   const AdminLogin = () => (
-    <div className="admin-login-overlay" onClick={(e) => {
+    <div className="admin-login-overlay ultra-stable" onClick={(e) => {
       if (e.target === e.currentTarget) {
         setShowAdminLogin(false);
       }
     }}>
-      <div className="admin-login" onClick={(e) => e.stopPropagation()}>
-        <div className="admin-login-header">
+      <div className="admin-login ultra-stable" onClick={(e) => e.stopPropagation()}>
+        <div className="admin-login-header ultra-stable">
           <h2>🔐 Secure Admin Access</h2>
-          <button className="admin-close" onClick={() => setShowAdminLogin(false)}>✕</button>
+          <button className="admin-close ultra-stable" onClick={() => setShowAdminLogin(false)}>✕</button>
         </div>
         
-        <form onSubmit={handleAdminLogin} className="admin-login-form">
-          <div className="admin-credentials-display">
+        <form onSubmit={handleAdminLogin} className="admin-login-form ultra-stable">
+          <div className="admin-credentials-display ultra-stable">
             <p><strong>Demo Credentials:</strong></p>
             <p>Username: admin</p>
             <p>Password: pandamodz2024</p>
           </div>
           
-          <div className="form-group">
+          <div className="form-group ultra-stable">
             <label htmlFor="admin-username">Username:</label>
             <input
               id="admin-username"
@@ -535,10 +535,11 @@ const App = () => {
               autoComplete="username"
               maxLength="50"
               disabled={isLocked}
+              className="ultra-stable-input"
             />
           </div>
           
-          <div className="form-group">
+          <div className="form-group ultra-stable">
             <label htmlFor="admin-password">Password:</label>
             <input
               id="admin-password"
@@ -550,25 +551,26 @@ const App = () => {
               autoComplete="current-password"
               maxLength="50"
               disabled={isLocked}
+              className="ultra-stable-input"
             />
           </div>
 
           {isLocked && (
-            <div className="lockout-warning">
+            <div className="lockout-warning ultra-stable">
               🔒 Account temporarily locked. Time remaining: {Math.ceil((lockoutTime - Date.now()) / 1000 / 60)} minutes
             </div>
           )}
           
-          {loginError && <div className="admin-error">{loginError}</div>}
+          {loginError && <div className="admin-error ultra-stable">{loginError}</div>}
           
-          <button type="submit" className="admin-login-btn" disabled={isLocked}>
+          <button type="submit" className="admin-login-btn ultra-stable" disabled={isLocked}>
             🚀 Secure Login
           </button>
           
-          <div className="quick-login">
+          <div className="quick-login ultra-stable">
             <button 
               type="button" 
-              className="quick-login-btn"
+              className="quick-login-btn ultra-stable"
               onClick={() => {
                 setLoginUsername('admin');
                 setLoginPassword('pandamodz2024');
@@ -580,7 +582,7 @@ const App = () => {
             
             <button 
               type="button" 
-              className="instant-login-btn"
+              className="instant-login-btn ultra-stable"
               onClick={() => {
                 if (!isLocked) {
                   const currentTime = Date.now();
@@ -604,7 +606,7 @@ const App = () => {
           </div>
         </form>
         
-        <div className="admin-help">
+        <div className="admin-help ultra-stable">
           <p>🔒 Secured with enterprise-grade protection</p>
         </div>
       </div>
