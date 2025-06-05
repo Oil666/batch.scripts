@@ -207,7 +207,7 @@ body {
   flex-wrap: wrap;
 }
 
-.cta-primary, .cta-secondary {
+.cta-primary, .cta-secondary, .cta-youtube {
   padding: 1rem 2rem;
   border: none;
   border-radius: 12px;
@@ -217,6 +217,22 @@ body {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.cta-youtube {
+  background: linear-gradient(135deg, #ff0000, #cc0000);
+  color: #ffffff;
+  box-shadow: 0 8px 32px rgba(255, 0, 0, 0.3);
+}
+
+.cta-youtube:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(255, 0, 0, 0.4);
 }
 
 .cta-primary {
