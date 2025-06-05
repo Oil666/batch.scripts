@@ -226,26 +226,70 @@ const App = () => {
     }
   }, [loginUsername, loginPassword, isLocked, lockoutTime, loginAttempts, sanitizeInput, startSessionTimer, startLockoutTimer]);
 
-  // Memoized and optimized input handlers to prevent flickering
-  const handleUsernameChange = useCallback((e) => {
+  // Ultra-stable input handlers with debouncing to prevent flickering
+  const [stableUsername, setStableUsername] = useState('');
+  const [stablePassword, setStablePassword] = useState('');
+  const inputTimeoutRef = useRef(null);
+
+  // Immediate update handlers (no delays, no re-renders)
+  const handleUsernameInput = useCallback((e) => {
     const value = e.target.value;
-    setLoginUsername(value);
+    setStableUsername(value);
+    
+    // Clear any existing timeout
+    if (inputTimeoutRef.current) {
+      clearTimeout(inputTimeoutRef.current);
+    }
+    
+    // Update main state with minimal delay to prevent flickering
+    inputTimeoutRef.current = setTimeout(() => {
+      setLoginUsername(value);
+    }, 10);
   }, []);
 
-  const handlePasswordChange = useCallback((e) => {
+  const handlePasswordInput = useCallback((e) => {
     const value = e.target.value;
-    setLoginPassword(value);
+    setStablePassword(value);
+    
+    // Clear any existing timeout
+    if (inputTimeoutRef.current) {
+      clearTimeout(inputTimeoutRef.current);
+    }
+    
+    // Update main state with minimal delay to prevent flickering
+    inputTimeoutRef.current = setTimeout(() => {
+      setLoginPassword(value);
+    }, 10);
   }, []);
 
-  // Stable form handlers
-  const handleQuickFill = useCallback((e) => {
+  // Sync stable states with main states when form opens
+  useEffect(() => {
+    if (showAdminLogin) {
+      setStableUsername(loginUsername);
+      setStablePassword(loginPassword);
+    }
+  }, [showAdminLogin, loginUsername, loginPassword]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (inputTimeoutRef.current) {
+        clearTimeout(inputTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Ultra-stable form handlers
+  const handleStableQuickFill = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
+    setStableUsername('admin');
+    setStablePassword('pandamodz2024');
     setLoginUsername('admin');
     setLoginPassword('pandamodz2024');
   }, []);
 
-  const handleInstantAccess = useCallback((e) => {
+  const handleStableInstantAccess = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
     if (!isLocked) {
@@ -261,121 +305,266 @@ const App = () => {
       localStorage.setItem('pandaAdminSession', 'true');
       localStorage.setItem('pandaSessionTime', currentTime.toString());
       startSessionTimer(SESSION_DURATION);
-      
-      console.log('[SECURITY] Admin instant access at:', new Date().toISOString());
     }
   }, [isLocked, startSessionTimer]);
 
-  // Stable close handler
-  const handleCloseLogin = useCallback(() => {
+  // Ultra-stable close handler
+  const handleStableCloseLogin = useCallback((e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setShowAdminLogin(false);
     setLoginError('');
+    setStableUsername('');
+    setStablePassword('');
   }, []);
 
-  // Memoized AdminLogin component to prevent unnecessary re-renders
+  // Enhanced login handler that uses stable values
+  const handleStableAdminLogin = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Use stable values for validation
+    const username = stableUsername || loginUsername;
+    const password = stablePassword || loginPassword;
+    
+    // Check if locked out
+    if (isLocked) {
+      const remainingTime = Math.ceil((lockoutTime - Date.now()) / 1000 / 60);
+      setLoginError(`Account locked. Try again in ${remainingTime} minutes.`);
+      return;
+    }
+
+    // Validate inputs
+    if (!username.trim() || !password.trim()) {
+      setLoginError('Please enter both username and password');
+      return;
+    }
+
+    // Check credentials
+    if (username.trim() === 'admin' && password.trim() === 'pandamodz2024') {
+      // Successful login
+      const currentTime = Date.now();
+      const expiryTime = currentTime + SESSION_DURATION;
+      
+      setIsAdminLoggedIn(true);
+      setShowAdminLogin(false);
+      setShowAdminPanel(true);
+      setLoginError('');
+      setLoginAttempts(0);
+      setSessionExpiry(expiryTime);
+      
+      // Store secure session
+      localStorage.setItem('pandaAdminSession', 'true');
+      localStorage.setItem('pandaSessionTime', currentTime.toString());
+      localStorage.removeItem('pandaLoginAttempts');
+      localStorage.removeItem('pandaLockoutEnd');
+      
+      // Start session timer
+      startSessionTimer(SESSION_DURATION);
+      
+      // Clear forms
+      setLoginUsername('');
+      setLoginPassword('');
+      setStableUsername('');
+      setStablePassword('');
+      
+    } else {
+      // Failed login
+      const newAttempts = loginAttempts + 1;
+      setLoginAttempts(newAttempts);
+      localStorage.setItem('pandaLoginAttempts', newAttempts.toString());
+      
+      if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
+        // Lock account
+        const lockoutEnd = Date.now() + LOCKOUT_DURATION;
+        setIsLocked(true);
+        setLockoutTime(lockoutEnd);
+        localStorage.setItem('pandaLockoutEnd', lockoutEnd.toString());
+        startLockoutTimer(LOCKOUT_DURATION);
+        
+        setLoginError(`Too many failed attempts. Account locked for 5 minutes.`);
+      } else {
+        const remaining = MAX_LOGIN_ATTEMPTS - newAttempts;
+        setLoginError(`Invalid credentials. ${remaining} attempts remaining.`);
+      }
+      
+      // Clear password field for security
+      setStablePassword('');
+      setLoginPassword('');
+    }
+  }, [stableUsername, stablePassword, loginUsername, loginPassword, isLocked, lockoutTime, loginAttempts, startSessionTimer, startLockoutTimer]);
+
+  // Completely re-written AdminLogin component with maximum stability
   const AdminLogin = React.memo(() => {
     return (
       <div 
-        className="admin-login-overlay stable"
+        className="admin-login-overlay ultra-stable"
         onMouseDown={(e) => {
           if (e.target === e.currentTarget) {
-            handleCloseLogin();
+            e.preventDefault();
+            handleStableCloseLogin();
+          }
+        }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            e.preventDefault();
+            handleStableCloseLogin();
           }
         }}
       >
         <div 
-          className="admin-login stable" 
-          onMouseDown={(e) => e.stopPropagation()}
-          onClick={(e) => e.stopPropagation()}
+          className="admin-login ultra-stable" 
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
         >
-          <div className="admin-login-header">
+          <div className="admin-login-header ultra-stable">
             <h2>🔐 Secure Admin Access</h2>
             <button 
-              className="admin-close" 
-              onMouseDown={(e) => e.stopPropagation()}
-              onClick={handleCloseLogin}
+              className="admin-close ultra-stable" 
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleStableCloseLogin();
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleStableCloseLogin();
+              }}
               type="button"
             >
               ✕
             </button>
           </div>
           
-          <form onSubmit={handleAdminLogin} className="admin-login-form stable">
-            <div className="security-info">
+          <form 
+            onSubmit={handleStableAdminLogin} 
+            className="admin-login-form ultra-stable"
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="security-info ultra-stable">
               <div className="security-badge-login">🔒 Enhanced Security Active</div>
               <p>• Max 3 login attempts</p>
               <p>• 5-minute lockout on failure</p>
               <p>• 30-minute session timeout</p>
             </div>
 
-            <div className="admin-credentials-display">
+            <div className="admin-credentials-display ultra-stable">
               <p><strong>Demo Credentials:</strong></p>
               <p>Username: admin</p>
               <p>Password: pandamodz2024</p>
             </div>
             
-            <div className="form-group stable">
-              <label htmlFor="admin-username">Username:</label>
+            <div className="form-group ultra-stable">
+              <label htmlFor="admin-username-ultra">Username:</label>
               <input
-                id="admin-username"
+                id="admin-username-ultra"
                 type="text"
-                value={loginUsername}
-                onChange={handleUsernameChange}
-                onFocus={(e) => e.stopPropagation()}
-                onBlur={(e) => e.stopPropagation()}
-                onClick={(e) => e.stopPropagation()}
-                onMouseDown={(e) => e.stopPropagation()}
+                value={stableUsername}
+                onChange={handleUsernameInput}
+                onInput={handleUsernameInput}
+                onFocus={(e) => {
+                  e.stopPropagation();
+                }}
+                onBlur={(e) => {
+                  e.stopPropagation();
+                  setLoginUsername(e.target.value);
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                }}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                }}
+                onKeyUp={(e) => {
+                  e.stopPropagation();
+                }}
                 placeholder="Enter admin username"
                 required
                 autoComplete="username"
                 maxLength="50"
                 disabled={isLocked}
-                className="stable-input"
+                className="ultra-stable-input"
+                spellCheck="false"
+                autoCorrect="off"
+                autoCapitalize="off"
               />
             </div>
             
-            <div className="form-group stable">
-              <label htmlFor="admin-password">Password:</label>
+            <div className="form-group ultra-stable">
+              <label htmlFor="admin-password-ultra">Password:</label>
               <input
-                id="admin-password"
+                id="admin-password-ultra"
                 type="password"
-                value={loginPassword}
-                onChange={handlePasswordChange}
-                onFocus={(e) => e.stopPropagation()}
-                onBlur={(e) => e.stopPropagation()}
-                onClick={(e) => e.stopPropagation()}
-                onMouseDown={(e) => e.stopPropagation()}
+                value={stablePassword}
+                onChange={handlePasswordInput}
+                onInput={handlePasswordInput}
+                onFocus={(e) => {
+                  e.stopPropagation();
+                }}
+                onBlur={(e) => {
+                  e.stopPropagation();
+                  setLoginPassword(e.target.value);
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                }}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                }}
+                onKeyUp={(e) => {
+                  e.stopPropagation();
+                }}
                 placeholder="Enter admin password"
                 required
                 autoComplete="current-password"
                 maxLength="50"
                 disabled={isLocked}
-                className="stable-input"
+                className="ultra-stable-input"
+                spellCheck="false"
+                autoCorrect="off"
+                autoCapitalize="off"
               />
             </div>
 
             {isLocked && (
-              <div className="lockout-warning stable">
+              <div className="lockout-warning ultra-stable">
                 🔒 Account temporarily locked. Time remaining: {Math.ceil((lockoutTime - Date.now()) / 1000 / 60)} minutes
               </div>
             )}
             
-            {loginError && <div className="admin-error stable">{loginError}</div>}
+            {loginError && <div className="admin-error ultra-stable">{loginError}</div>}
             
             <button 
               type="submit" 
-              className="admin-login-btn stable" 
+              className="admin-login-btn ultra-stable" 
               disabled={isLocked}
               onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
             >
               🚀 Secure Login
             </button>
             
-            <div className="quick-login stable">
+            <div className="quick-login ultra-stable">
               <button 
                 type="button" 
-                className="quick-login-btn stable"
-                onClick={handleQuickFill}
+                className="quick-login-btn ultra-stable"
+                onClick={handleStableQuickFill}
                 onMouseDown={(e) => e.stopPropagation()}
                 disabled={isLocked}
               >
@@ -384,8 +573,8 @@ const App = () => {
               
               <button 
                 type="button" 
-                className="instant-login-btn stable"
-                onClick={handleInstantAccess}
+                className="instant-login-btn ultra-stable"
+                onClick={handleStableInstantAccess}
                 onMouseDown={(e) => e.stopPropagation()}
                 disabled={isLocked}
               >
@@ -394,7 +583,7 @@ const App = () => {
             </div>
           </form>
           
-          <div className="admin-help">
+          <div className="admin-help ultra-stable">
             <p>🔒 Secured with enterprise-grade protection</p>
           </div>
         </div>
