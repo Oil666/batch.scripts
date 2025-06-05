@@ -357,132 +357,624 @@ const App = () => {
     </div>
   );
 
-  // Enhanced Admin Panel with security features
-  const AdminPanel = () => (
-    <div className="admin-panel-overlay" onClick={(e) => e.target === e.currentTarget && setShowAdminPanel(false)}>
-      <div className="admin-panel">
-        <div className="admin-header">
-          <h2>🛡️ PANDA_MODZ Admin Panel</h2>
-          <div className="admin-header-info">
-            <span className="session-info">
-              Session: {sessionExpiry ? new Date(sessionExpiry).toLocaleTimeString() : 'Active'}
-            </span>
-            <button className="admin-close" onClick={() => setShowAdminPanel(false)}>✕</button>
-          </div>
-        </div>
+  // Enhanced Admin Panel with advanced features
+  const [activeAdminTab, setActiveAdminTab] = useState('dashboard');
+  const [adminData, setAdminData] = useState({
+    totalVisitors: 15847,
+    todayVisitors: 324,
+    totalDownloads: 89452,
+    activeUsers: 1847,
+    serverStatus: 'online',
+    cpuUsage: 34,
+    memoryUsage: 67,
+    storageUsage: 45
+  });
+
+  // Enhanced Admin Panel with tabs and advanced features
+  const AdminPanel = () => {
+    const renderTabContent = () => {
+      switch(activeAdminTab) {
+        case 'dashboard':
+          return (
+            <div className="admin-dashboard">
+              {/* Key Metrics */}
+              <div className="metrics-row">
+                <div className="metric-card primary">
+                  <div className="metric-icon">👥</div>
+                  <div className="metric-content">
+                    <h3>{adminData.totalVisitors.toLocaleString()}</h3>
+                    <p>Total Visitors</p>
+                    <span className="metric-change positive">+12.5%</span>
+                  </div>
+                </div>
+                <div className="metric-card success">
+                  <div className="metric-icon">⬇️</div>
+                  <div className="metric-content">
+                    <h3>{adminData.totalDownloads.toLocaleString()}</h3>
+                    <p>Total Downloads</p>
+                    <span className="metric-change positive">+8.3%</span>
+                  </div>
+                </div>
+                <div className="metric-card warning">
+                  <div className="metric-icon">🟢</div>
+                  <div className="metric-content">
+                    <h3>{adminData.activeUsers.toLocaleString()}</h3>
+                    <p>Active Users</p>
+                    <span className="metric-change positive">+15.7%</span>
+                  </div>
+                </div>
+                <div className="metric-card info">
+                  <div className="metric-icon">📊</div>
+                  <div className="metric-content">
+                    <h3>{adminData.todayVisitors}</h3>
+                    <p>Today's Visitors</p>
+                    <span className="metric-change positive">+23.1%</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Charts Row */}
+              <div className="charts-row">
+                <div className="chart-card">
+                  <h3>📈 Traffic Analytics</h3>
+                  <div className="chart-placeholder">
+                    <div className="chart-bars">
+                      <div className="bar" style={{height: '60%'}}><span>Mon</span></div>
+                      <div className="bar" style={{height: '80%'}}><span>Tue</span></div>
+                      <div className="bar" style={{height: '45%'}}><span>Wed</span></div>
+                      <div className="bar" style={{height: '90%'}}><span>Thu</span></div>
+                      <div className="bar" style={{height: '70%'}}><span>Fri</span></div>
+                      <div className="bar" style={{height: '85%'}}><span>Sat</span></div>
+                      <div className="bar" style={{height: '95%'}}><span>Sun</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="chart-card">
+                  <h3>🎯 Popular Content</h3>
+                  <div className="content-list">
+                    <div className="content-item">
+                      <span className="content-name">Advanced Trainers</span>
+                      <div className="progress-bar">
+                        <div className="progress" style={{width: '85%'}}></div>
+                      </div>
+                      <span className="content-value">85%</span>
+                    </div>
+                    <div className="content-item">
+                      <span className="content-name">Script Mods</span>
+                      <div className="progress-bar">
+                        <div className="progress" style={{width: '72%'}}></div>
+                      </div>
+                      <span className="content-value">72%</span>
+                    </div>
+                    <div className="content-item">
+                      <span className="content-name">Video Tutorials</span>
+                      <div className="progress-bar">
+                        <div className="progress" style={{width: '68%'}}></div>
+                      </div>
+                      <span className="content-value">68%</span>
+                    </div>
+                    <div className="content-item">
+                      <span className="content-name">Quality Tools</span>
+                      <div className="progress-bar">
+                        <div className="progress" style={{width: '59%'}}></div>
+                      </div>
+                      <span className="content-value">59%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* System Status */}
+              <div className="status-row">
+                <div className="status-card">
+                  <h3>🖥️ System Performance</h3>
+                  <div className="performance-metrics">
+                    <div className="perf-item">
+                      <span>CPU Usage</span>
+                      <div className="perf-bar">
+                        <div className="perf-fill cpu" style={{width: `${adminData.cpuUsage}%`}}></div>
+                      </div>
+                      <span>{adminData.cpuUsage}%</span>
+                    </div>
+                    <div className="perf-item">
+                      <span>Memory</span>
+                      <div className="perf-bar">
+                        <div className="perf-fill memory" style={{width: `${adminData.memoryUsage}%`}}></div>
+                      </div>
+                      <span>{adminData.memoryUsage}%</span>
+                    </div>
+                    <div className="perf-item">
+                      <span>Storage</span>
+                      <div className="perf-bar">
+                        <div className="perf-fill storage" style={{width: `${adminData.storageUsage}%`}}></div>
+                      </div>
+                      <span>{adminData.storageUsage}%</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="status-card">
+                  <h3>⚡ Quick Actions</h3>
+                  <div className="quick-actions-grid">
+                    <button className="quick-action">
+                      <span className="qa-icon">📝</span>
+                      <span>New Post</span>
+                    </button>
+                    <button className="quick-action">
+                      <span className="qa-icon">📊</span>
+                      <span>Analytics</span>
+                    </button>
+                    <button className="quick-action">
+                      <span className="qa-icon">👥</span>
+                      <span>Users</span>
+                    </button>
+                    <button className="quick-action">
+                      <span className="qa-icon">⚙️</span>
+                      <span>Settings</span>
+                    </button>
+                    <button className="quick-action">
+                      <span className="qa-icon">💾</span>
+                      <span>Backup</span>
+                    </button>
+                    <button className="quick-action">
+                      <span className="qa-icon">🔄</span>
+                      <span>Update</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
         
-        <div className="admin-content">
-          <div className="admin-welcome">
-            <p className="welcome-message">✅ Successfully logged in as Administrator</p>
-            <div className="security-status">
-              <span className="security-badge">🔒 Secure Session</span>
-              <span className="ip-info">IP: 127.0.0.1 (Localhost)</span>
-              <span className="browser-info">Browser: {navigator.userAgent.split(' ')[0]}</span>
+        case 'content':
+          return (
+            <div className="admin-content-manager">
+              <div className="content-header">
+                <h3>📝 Content Management</h3>
+                <button className="add-content-btn">+ Add New Content</button>
+              </div>
+              
+              <div className="content-sections">
+                <div className="content-section">
+                  <h4>🎥 Video Management</h4>
+                  <div className="content-items">
+                    {videos.map((video, index) => (
+                      <div key={index} className="content-item-card">
+                        <div className="content-thumb">
+                          <img src={`https://img.youtube.com/vi/${video.id}/mqdefault.jpg`} alt={video.title} />
+                        </div>
+                        <div className="content-details">
+                          <h5>{video.title}</h5>
+                          <p>{video.description}</p>
+                          <div className="content-actions">
+                            <button className="edit-btn">✏️ Edit</button>
+                            <button className="delete-btn">🗑️ Delete</button>
+                            <button className="analytics-btn">📊 Analytics</button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="content-section">
+                  <h4>🎮 Services Management</h4>
+                  <div className="content-items">
+                    {services.map((service, index) => (
+                      <div key={index} className="content-item-card">
+                        <div className="content-thumb">
+                          <img src={service.image} alt={service.title} />
+                        </div>
+                        <div className="content-details">
+                          <h5>{service.title}</h5>
+                          <p>{service.description}</p>
+                          <div className="content-actions">
+                            <button className="edit-btn">✏️ Edit</button>
+                            <button className="delete-btn">🗑️ Delete</button>
+                            <button className="featured-btn">⭐ Feature</button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+
+        case 'analytics':
+          return (
+            <div className="admin-analytics">
+              <div className="analytics-header">
+                <h3>📊 Advanced Analytics</h3>
+                <div className="date-range">
+                  <select>
+                    <option>Last 7 days</option>
+                    <option>Last 30 days</option>
+                    <option>Last 90 days</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="analytics-grid">
+                <div className="analytics-card">
+                  <h4>🌍 Geographic Distribution</h4>
+                  <div className="geo-stats">
+                    <div className="geo-item">
+                      <span className="country">🇺🇸 United States</span>
+                      <div className="geo-bar">
+                        <div className="geo-fill" style={{width: '65%'}}></div>
+                      </div>
+                      <span>65%</span>
+                    </div>
+                    <div className="geo-item">
+                      <span className="country">🇬🇧 United Kingdom</span>
+                      <div className="geo-bar">
+                        <div className="geo-fill" style={{width: '12%'}}></div>
+                      </div>
+                      <span>12%</span>
+                    </div>
+                    <div className="geo-item">
+                      <span className="country">🇩🇪 Germany</span>
+                      <div className="geo-bar">
+                        <div className="geo-fill" style={{width: '8%'}}></div>
+                      </div>
+                      <span>8%</span>
+                    </div>
+                    <div className="geo-item">
+                      <span className="country">🇨🇦 Canada</span>
+                      <div className="geo-bar">
+                        <div className="geo-fill" style={{width: '7%'}}></div>
+                      </div>
+                      <span>7%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="analytics-card">
+                  <h4>📱 Device Analytics</h4>
+                  <div className="device-stats">
+                    <div className="device-chart">
+                      <div className="device-slice desktop" style={{'--percentage': '58%'}}>
+                        <span>Desktop 58%</span>
+                      </div>
+                      <div className="device-slice mobile" style={{'--percentage': '32%'}}>
+                        <span>Mobile 32%</span>
+                      </div>
+                      <div className="device-slice tablet" style={{'--percentage': '10%'}}>
+                        <span>Tablet 10%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="analytics-card">
+                  <h4>🔗 Referral Sources</h4>
+                  <div className="referral-list">
+                    <div className="referral-item">
+                      <span className="referral-source">🔍 Google Search</span>
+                      <span className="referral-count">2,847</span>
+                    </div>
+                    <div className="referral-item">
+                      <span className="referral-source">📺 YouTube</span>
+                      <span className="referral-count">1,423</span>
+                    </div>
+                    <div className="referral-item">
+                      <span className="referral-source">💬 Discord</span>
+                      <span className="referral-count">987</span>
+                    </div>
+                    <div className="referral-item">
+                      <span className="referral-source">🐦 Twitter</span>
+                      <span className="referral-count">654</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="analytics-card">
+                  <h4>⏱️ User Engagement</h4>
+                  <div className="engagement-metrics">
+                    <div className="engagement-item">
+                      <span className="metric-label">Avg. Session</span>
+                      <span className="metric-value">4:23</span>
+                    </div>
+                    <div className="engagement-item">
+                      <span className="metric-label">Bounce Rate</span>
+                      <span className="metric-value">23.4%</span>
+                    </div>
+                    <div className="engagement-item">
+                      <span className="metric-label">Pages/Session</span>
+                      <span className="metric-value">3.7</span>
+                    </div>
+                    <div className="engagement-item">
+                      <span className="metric-label">Return Visitors</span>
+                      <span className="metric-value">67%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+
+        case 'security':
+          return (
+            <div className="admin-security">
+              <div className="security-header">
+                <h3>🔒 Security Center</h3>
+                <div className="security-status online">🟢 All Systems Secure</div>
+              </div>
+
+              <div className="security-sections">
+                <div className="security-section">
+                  <h4>🛡️ Security Overview</h4>
+                  <div className="security-metrics">
+                    <div className="security-metric">
+                      <span className="security-icon">🔑</span>
+                      <div className="security-info">
+                        <h5>Login Attempts</h5>
+                        <p>{loginAttempts}/3 failed attempts</p>
+                      </div>
+                      <div className="security-status-indicator success"></div>
+                    </div>
+                    <div className="security-metric">
+                      <span className="security-icon">⏰</span>
+                      <div className="security-info">
+                        <h5>Session Status</h5>
+                        <p>Active for {Math.floor((Date.now() - (sessionExpiry - SESSION_DURATION)) / 1000 / 60)} minutes</p>
+                      </div>
+                      <div className="security-status-indicator success"></div>
+                    </div>
+                    <div className="security-metric">
+                      <span className="security-icon">🌐</span>
+                      <div className="security-info">
+                        <h5>IP Address</h5>
+                        <p>127.0.0.1 (Localhost)</p>
+                      </div>
+                      <div className="security-status-indicator success"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="security-section">
+                  <h4>📋 Security Log</h4>
+                  <div className="security-log">
+                    <div className="log-item success">
+                      <span className="log-time">{new Date().toLocaleTimeString()}</span>
+                      <span className="log-message">Admin login successful</span>
+                      <span className="log-ip">127.0.0.1</span>
+                    </div>
+                    <div className="log-item info">
+                      <span className="log-time">{new Date(Date.now() - 300000).toLocaleTimeString()}</span>
+                      <span className="log-message">Session started</span>
+                      <span className="log-ip">127.0.0.1</span>
+                    </div>
+                    <div className="log-item warning">
+                      <span className="log-time">{new Date(Date.now() - 600000).toLocaleTimeString()}</span>
+                      <span className="log-message">Failed login attempt</span>
+                      <span className="log-ip">192.168.1.100</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="security-section">
+                  <h4>⚙️ Security Settings</h4>
+                  <div className="security-settings">
+                    <div className="setting-item">
+                      <div className="setting-info">
+                        <h5>Two-Factor Authentication</h5>
+                        <p>Add an extra layer of security</p>
+                      </div>
+                      <div className="setting-toggle">
+                        <input type="checkbox" id="2fa" />
+                        <label htmlFor="2fa" className="toggle-switch"></label>
+                      </div>
+                    </div>
+                    <div className="setting-item">
+                      <div className="setting-info">
+                        <h5>Session Timeout</h5>
+                        <p>Automatically logout after inactivity</p>
+                      </div>
+                      <select className="setting-select">
+                        <option>15 minutes</option>
+                        <option selected>30 minutes</option>
+                        <option>1 hour</option>
+                      </select>
+                    </div>
+                    <div className="setting-item">
+                      <div className="setting-info">
+                        <h5>Login Notifications</h5>
+                        <p>Get notified of new login attempts</p>
+                      </div>
+                      <div className="setting-toggle">
+                        <input type="checkbox" id="notifications" checked />
+                        <label htmlFor="notifications" className="toggle-switch"></label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+
+        case 'system':
+          return (
+            <div className="admin-system">
+              <div className="system-header">
+                <h3>⚙️ System Management</h3>
+                <div className="system-status online">🟢 All Systems Operational</div>
+              </div>
+
+              <div className="system-sections">
+                <div className="system-section">
+                  <h4>📊 System Resources</h4>
+                  <div className="resource-monitors">
+                    <div className="resource-monitor">
+                      <div className="resource-header">
+                        <span className="resource-icon">🖥️</span>
+                        <h5>CPU Usage</h5>
+                        <span className="resource-value">{adminData.cpuUsage}%</span>
+                      </div>
+                      <div className="resource-bar">
+                        <div className="resource-fill cpu" style={{width: `${adminData.cpuUsage}%`}}></div>
+                      </div>
+                    </div>
+                    <div className="resource-monitor">
+                      <div className="resource-header">
+                        <span className="resource-icon">💾</span>
+                        <h5>Memory Usage</h5>
+                        <span className="resource-value">{adminData.memoryUsage}%</span>
+                      </div>
+                      <div className="resource-bar">
+                        <div className="resource-fill memory" style={{width: `${adminData.memoryUsage}%`}}></div>
+                      </div>
+                    </div>
+                    <div className="resource-monitor">
+                      <div className="resource-header">
+                        <span className="resource-icon">💿</span>
+                        <h5>Storage Usage</h5>
+                        <span className="resource-value">{adminData.storageUsage}%</span>
+                      </div>
+                      <div className="resource-bar">
+                        <div className="resource-fill storage" style={{width: `${adminData.storageUsage}%`}}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="system-section">
+                  <h4>🔧 System Actions</h4>
+                  <div className="system-actions-grid">
+                    <button className="system-action primary">
+                      <span className="action-icon">💾</span>
+                      <div className="action-info">
+                        <h5>Create Backup</h5>
+                        <p>Full system backup</p>
+                      </div>
+                    </button>
+                    <button className="system-action warning">
+                      <span className="action-icon">🔄</span>
+                      <div className="action-info">
+                        <h5>Clear Cache</h5>
+                        <p>Clear all cached data</p>
+                      </div>
+                    </button>
+                    <button className="system-action info">
+                      <span className="action-icon">🔍</span>
+                      <div className="action-info">
+                        <h5>System Scan</h5>
+                        <p>Check for issues</p>
+                      </div>
+                    </button>
+                    <button className="system-action success">
+                      <span className="action-icon">⬆️</span>
+                      <div className="action-info">
+                        <h5>Update System</h5>
+                        <p>Install latest updates</p>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="system-section">
+                  <h4>📋 System Information</h4>
+                  <div className="system-info-grid">
+                    <div className="info-item">
+                      <span className="info-label">Version</span>
+                      <span className="info-value">v2.1.0</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">Uptime</span>
+                      <span className="info-value">7d 14h 23m</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">Database</span>
+                      <span className="info-value">Connected</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">Last Backup</span>
+                      <span className="info-value">2 hours ago</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+
+        default:
+          return <div>Loading...</div>;
+      }
+    };
+
+    return (
+      <div className="admin-panel-overlay" onClick={(e) => e.target === e.currentTarget && setShowAdminPanel(false)}>
+        <div className="admin-panel advanced">
+          <div className="admin-header advanced">
+            <div className="admin-brand">
+              <h2>🛡️ PANDA_MODZ Admin Console</h2>
+              <span className="admin-version">v2.1.0</span>
+            </div>
+            <div className="admin-header-controls">
+              <div className="session-info">
+                <span className="session-status">🟢 Active</span>
+                <span className="session-time">
+                  {sessionExpiry ? Math.floor((sessionExpiry - Date.now()) / 1000 / 60) : 30}m left
+                </span>
+              </div>
+              <button className="admin-minimize">−</button>
+              <button className="admin-close" onClick={() => setShowAdminPanel(false)}>✕</button>
             </div>
           </div>
           
-          <div className="admin-stats">
-            <div className="stat-card">
-              <h3>📺 Videos</h3>
-              <p>{videos.length} Active</p>
-            </div>
-            <div className="stat-card">
-              <h3>🎮 Services</h3>
-              <p>{services.length} Available</p>
-            </div>
-            <div className="stat-card">
-              <h3>🚀 Projects</h3>
-              <p>{showcaseItems.length} Featured</p>
-            </div>
-            <div className="stat-card">
-              <h3>🔒 Security</h3>
-              <p>Enhanced</p>
-            </div>
+          <div className="admin-navigation">
+            <button 
+              className={`nav-tab ${activeAdminTab === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setActiveAdminTab('dashboard')}
+            >
+              <span className="tab-icon">📊</span>
+              <span className="tab-label">Dashboard</span>
+            </button>
+            <button 
+              className={`nav-tab ${activeAdminTab === 'content' ? 'active' : ''}`}
+              onClick={() => setActiveAdminTab('content')}
+            >
+              <span className="tab-icon">📝</span>
+              <span className="tab-label">Content</span>
+            </button>
+            <button 
+              className={`nav-tab ${activeAdminTab === 'analytics' ? 'active' : ''}`}
+              onClick={() => setActiveAdminTab('analytics')}
+            >
+              <span className="tab-icon">📈</span>
+              <span className="tab-label">Analytics</span>
+            </button>
+            <button 
+              className={`nav-tab ${activeAdminTab === 'security' ? 'active' : ''}`}
+              onClick={() => setActiveAdminTab('security')}
+            >
+              <span className="tab-icon">🔒</span>
+              <span className="tab-label">Security</span>
+            </button>
+            <button 
+              className={`nav-tab ${activeAdminTab === 'system' ? 'active' : ''}`}
+              onClick={() => setActiveAdminTab('system')}
+            >
+              <span className="tab-icon">⚙️</span>
+              <span className="tab-label">System</span>
+            </button>
+            <button 
+              className="nav-tab logout"
+              onClick={handleSecureLogout}
+            >
+              <span className="tab-icon">🚪</span>
+              <span className="tab-label">Logout</span>
+            </button>
           </div>
 
-          <div className="admin-sections">
-            <div className="admin-section">
-              <h3>📊 Website Analytics</h3>
-              <div className="analytics-grid">
-                <div className="analytics-item">
-                  <span className="analytics-label">Page Views</span>
-                  <span className="analytics-value">12,547</span>
-                </div>
-                <div className="analytics-item">
-                  <span className="analytics-label">Unique Visitors</span>
-                  <span className="analytics-value">3,892</span>
-                </div>
-                <div className="analytics-item">
-                  <span className="analytics-label">Discord Clicks</span>
-                  <span className="analytics-value">1,234</span>
-                </div>
-                <div className="analytics-item">
-                  <span className="analytics-label">YouTube Views</span>
-                  <span className="analytics-value">8,765</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="admin-section">
-              <h3>🔒 Security Dashboard</h3>
-              <div className="security-grid">
-                <div className="security-item">
-                  <span className="security-label">Login Attempts</span>
-                  <span className="security-value">{loginAttempts}/3</span>
-                </div>
-                <div className="security-item">
-                  <span className="security-label">Account Status</span>
-                  <span className="security-value">{isLocked ? 'Locked' : 'Active'}</span>
-                </div>
-                <div className="security-item">
-                  <span className="security-label">Session Time</span>
-                  <span className="security-value">30m</span>
-                </div>
-                <div className="security-item">
-                  <span className="security-label">Last Access</span>
-                  <span className="security-value">{new Date().toLocaleTimeString()}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="admin-section">
-              <h3>🎬 Content Management</h3>
-              <div className="content-actions">
-                <button className="admin-btn">📝 Edit Homepage</button>
-                <button className="admin-btn">🎥 Manage Videos</button>
-                <button className="admin-btn">🎮 Update Services</button>
-                <button className="admin-btn">🚀 Edit Showcase</button>
-              </div>
-            </div>
-
-            <div className="admin-section">
-              <h3>🔗 Quick Links Management</h3>
-              <div className="links-grid">
-                <div className="link-item">
-                  <span>Discord:</span>
-                  <span className="link-url">discord.com/invite/sYT5UXkv7F</span>
-                </div>
-                <div className="link-item">
-                  <span>YouTube:</span>
-                  <span className="link-url">youtube.com/@DarkPandax</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="admin-section">
-              <h3>⚙️ System Actions</h3>
-              <div className="system-actions">
-                <button className="admin-btn success">💾 Backup Data</button>
-                <button className="admin-btn warning">🔄 Clear Cache</button>
-                <button className="admin-btn info">📋 Export Logs</button>
-                <button className="admin-btn danger" onClick={handleSecureLogout}>🚪 Secure Logout</button>
-              </div>
-            </div>
+          <div className="admin-content advanced">
+            {renderTabContent()}
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Enhanced Admin Login with security features
   const AdminLogin = () => (
