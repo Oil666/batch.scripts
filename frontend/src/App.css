@@ -1054,6 +1054,15 @@ body {
     grid-template-columns: 1fr;
   }
   
+  .videos-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .video-wrapper {
+    height: 200px;
+  }
+  
   .section-title {
     font-size: 2.5rem;
   }
