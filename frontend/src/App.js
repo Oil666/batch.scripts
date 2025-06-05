@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import './App.css';
 
 const App = () => {
@@ -37,6 +37,10 @@ const App = () => {
   // Security refs
   const loginTimeoutRef = useRef(null);
   const sessionTimeoutRef = useRef(null);
+  
+  // Debounce refs for input stability
+  const usernameDebounceRef = useRef(null);
+  const passwordDebounceRef = useRef(null);
 
   // Security constants
   const ADMIN_USER = 'admin';
@@ -44,6 +48,25 @@ const App = () => {
   const MAX_LOGIN_ATTEMPTS = 3;
   const LOCKOUT_DURATION = 300000; // 5 minutes
   const SESSION_DURATION = 1800000; // 30 minutes
+  
+  // Debounced input handlers for ultra stability
+  const handleUsernameChange = useCallback((value) => {
+    if (usernameDebounceRef.current) {
+      clearTimeout(usernameDebounceRef.current);
+    }
+    usernameDebounceRef.current = setTimeout(() => {
+      setLoginUsername(value);
+    }, 0); // Immediate but debounced
+  }, []);
+  
+  const handlePasswordChange = useCallback((value) => {
+    if (passwordDebounceRef.current) {
+      clearTimeout(passwordDebounceRef.current);
+    }
+    passwordDebounceRef.current = setTimeout(() => {
+      setLoginPassword(value);
+    }, 0); // Immediate but debounced
+  }, []);
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
