@@ -57,7 +57,8 @@ const App = () => {
   const handleAdminLogout = () => {
     setIsAdminLoggedIn(false);
     setShowAdminPanel(false);
-    setAdminCredentials({ username: '', password: '' });
+    setLoginUsername('');
+    setLoginPassword('');
     localStorage.removeItem('pandaAdminSession');
   };
 
