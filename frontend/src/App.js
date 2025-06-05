@@ -38,19 +38,19 @@ const App = () => {
 
   const handleAdminLogin = (e) => {
     e.preventDefault();
-    console.log('Login attempt:', adminCredentials); // Debug log
+    console.log('Login attempt:', { username: loginUsername, password: loginPassword }); // Debug log
     
-    if (adminCredentials.username.trim() === ADMIN_USERNAME && adminCredentials.password.trim() === ADMIN_PASSWORD) {
+    if (loginUsername.trim() === ADMIN_USER && loginPassword.trim() === ADMIN_PASS) {
       console.log('Login successful'); // Debug log
       setIsAdminLoggedIn(true);
       setShowAdminLogin(false);
       setShowAdminPanel(true);
-      setAdminError('');
+      setLoginError('');
       localStorage.setItem('pandaAdminSession', 'true');
     } else {
       console.log('Login failed'); // Debug log
-      setAdminError('Invalid username or password');
-      setTimeout(() => setAdminError(''), 3000); // Clear error after 3 seconds
+      setLoginError('Invalid username or password');
+      setTimeout(() => setLoginError(''), 3000); // Clear error after 3 seconds
     }
   };
 
