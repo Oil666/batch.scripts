@@ -232,6 +232,12 @@ const App = () => {
         </div>
         
         <form onSubmit={handleAdminLogin} className="admin-login-form">
+          <div className="admin-credentials-display">
+            <p><strong>Test Credentials:</strong></p>
+            <p>Username: admin</p>
+            <p>Password: pandamodz2024</p>
+          </div>
+          
           <div className="form-group">
             <label>Username:</label>
             <input
@@ -240,6 +246,7 @@ const App = () => {
               onChange={(e) => setAdminCredentials({...adminCredentials, username: e.target.value})}
               placeholder="Enter admin username"
               required
+              autoComplete="username"
             />
           </div>
           
@@ -251,12 +258,25 @@ const App = () => {
               onChange={(e) => setAdminCredentials({...adminCredentials, password: e.target.value})}
               placeholder="Enter admin password"
               required
+              autoComplete="current-password"
             />
           </div>
           
           {adminError && <div className="admin-error">{adminError}</div>}
           
           <button type="submit" className="admin-login-btn">🚀 Access Admin Panel</button>
+          
+          <div className="quick-login">
+            <button 
+              type="button" 
+              className="quick-login-btn"
+              onClick={() => {
+                setAdminCredentials({ username: 'admin', password: 'pandamodz2024' });
+              }}
+            >
+              🔑 Quick Fill Credentials
+            </button>
+          </div>
         </form>
         
         <div className="admin-help">
