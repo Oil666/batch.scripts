@@ -503,8 +503,8 @@ const App = () => {
     );
   };
 
-  // Admin Login Component
-  const AdminLogin = () => (
+  // Admin Login Component (Memoized for stability)
+  const AdminLogin = React.memo(() => (
     <div className="admin-login-overlay ultra-stable" onClick={(e) => {
       if (e.target === e.currentTarget) {
         setShowAdminLogin(false);
@@ -611,7 +611,7 @@ const App = () => {
         </div>
       </div>
     </div>
-  );
+  ));
 
   return (
     <div className="app">
