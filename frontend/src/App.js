@@ -107,6 +107,10 @@ const App = () => {
               <button className="cta-secondary" onClick={() => scrollToSection('showcase')}>
                 View Showcase
               </button>
+              <a href="https://www.youtube.com/@DarkPandax" target="_blank" rel="noopener noreferrer" className="cta-youtube">
+                <span className="youtube-icon">📺</span>
+                Watch Tutorials
+              </a>
             </div>
           </div>
           <div className="hero-visual">
