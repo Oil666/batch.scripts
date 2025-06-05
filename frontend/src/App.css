@@ -1100,6 +1100,21 @@ body {
   overflow-y: auto;
 }
 
+.admin-welcome {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.welcome-message {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid #10b981;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #10b981;
+  font-weight: 600;
+  margin: 0;
+}
+
 .admin-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
