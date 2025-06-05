@@ -3821,8 +3821,22 @@ body {
 @media (max-width: 1024px) {
   .hero-content {
     grid-template-columns: 1fr;
-    gap: 2rem;
     text-align: center;
+    gap: 2rem;
+  }
+
+  .panda-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .panda-card {
+    padding: 2rem;
+    min-height: 250px;
+  }
+
+  .panda-card h3 {
+    font-size: 1.5rem;
   }
   
   .features-content,
