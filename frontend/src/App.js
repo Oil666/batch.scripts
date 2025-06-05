@@ -70,24 +70,6 @@ const App = () => {
       embedUrl: 'https://www.youtube.com/embed/ykKewCjcfy8?start=125'
     }
   ];
-    {
-      title: 'Advanced Trainers',
-      description: 'Sophisticated training tools for popular AAA titles',
-      image: 'https://images.unsplash.com/photo-1656662961786-b04873ceb4b9',
-      stats: '50K+ Downloads'
-    },
-    {
-      title: 'Script Collection',
-      description: 'Comprehensive automation and enhancement scripts',
-      image: 'https://images.unsplash.com/photo-1612404475557-369522ece36f',
-      stats: '25K+ Active Users'
-    },
-    {
-      title: 'Custom Solutions',
-      description: 'Bespoke modifications tailored to your needs',
-      image: 'https://images.pexels.com/photos/8728559/pexels-photo-8728559.jpeg',
-      stats: '100% Satisfaction'
-    }
   ];
 
   return (
