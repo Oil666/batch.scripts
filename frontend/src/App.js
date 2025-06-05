@@ -1879,7 +1879,31 @@ const App = () => {
                 <div className="showcase-content">
                   <h3 className="showcase-title">{item.title}</h3>
                   <p className="showcase-description">{item.description}</p>
-                  <button className="showcase-button">
+                  <button 
+                    className="enhanced-showcase-button"
+                    onClick={() => {
+                      // Simulate download functionality
+                      const downloads = [
+                        'Advanced Trainer Pack v2.1.0.zip',
+                        'Script Collection v1.8.5.zip', 
+                        'Developer Tools Suite v3.0.1.zip'
+                      ];
+                      const randomDownload = downloads[Math.floor(Math.random() * downloads.length)];
+                      
+                      // Show toast notification
+                      const event = new CustomEvent('showToast', {
+                        detail: { 
+                          message: `🚀 Download started: ${randomDownload}`,
+                          type: 'success'
+                        }
+                      });
+                      window.dispatchEvent(event);
+                      
+                      // Increment download counter
+                      const counterEvent = new CustomEvent('incrementDownload');
+                      window.dispatchEvent(counterEvent);
+                    }}
+                  >
                     Download Now
                     <span className="download-icon">⬇️</span>
                   </button>
