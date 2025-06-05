@@ -709,6 +709,24 @@ const App = () => {
         </div>
       </section>
 
+      {/* PANDA Brand Showcase */}
+      <section className="panda-showcase">
+        <div className="panda-showcase-background">
+          <div className="panda-grid">
+            <div className="panda-card tech-panda">
+              <div className="panda-glow"></div>
+              <h3>TECH PANDA</h3>
+              <p>Next-Gen Gaming Experience</p>
+            </div>
+            <div className="panda-card dark-panda">
+              <div className="panda-glow"></div>
+              <h3>DARK PANDA</h3>
+              <p>Elite Modding & Hacking</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Services Section */}
       <section id="services" className="services">
         <div className="services-background">
