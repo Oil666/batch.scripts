@@ -871,6 +871,10 @@ const App = () => {
 
       {/* Community Section */}
       <section id="community" className="community">
+        <div className="community-background">
+          <img src="https://images.pexels.com/photos/8728559/pexels-photo-8728559.jpeg" alt="Gaming Community Background" className="community-bg-image" />
+          <div className="community-overlay"></div>
+        </div>
         <div className="container">
           <div className="community-content">
             <h2 className="community-title">Join the PANDA_MODZ Community</h2>
