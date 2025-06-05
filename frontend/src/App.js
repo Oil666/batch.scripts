@@ -683,8 +683,7 @@ const App = () => {
     </div>
   );
 
-  // Enhanced Admin Panel with advanced features
-  const [activeAdminTab, setActiveAdminTab] = useState('dashboard');
+  // Enhanced admin data with real-time updates
   const [adminData, setAdminData] = useState({
     totalVisitors: 15847,
     todayVisitors: 324,
@@ -693,8 +692,47 @@ const App = () => {
     serverStatus: 'online',
     cpuUsage: 34,
     memoryUsage: 67,
-    storageUsage: 45
+    storageUsage: 45,
+    uptime: '7d 14h 23m',
+    lastBackup: '2 hours ago',
+    version: 'v2.1.0'
   });
+
+  // Enhanced notification system
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: 'success', message: 'System backup completed successfully', time: '2 min ago' },
+    { id: 2, type: 'info', message: 'New user registered from Discord', time: '5 min ago' },
+    { id: 3, type: 'warning', message: 'High memory usage detected', time: '12 min ago' }
+  ]);
+
+  // Real-time data simulation
+  useEffect(() => {
+    if (isAdminLoggedIn && showAdminPanel) {
+      const interval = setInterval(() => {
+        setAdminData(prev => ({
+          ...prev,
+          cpuUsage: Math.max(15, Math.min(85, prev.cpuUsage + (Math.random() - 0.5) * 10)),
+          memoryUsage: Math.max(40, Math.min(90, prev.memoryUsage + (Math.random() - 0.5) * 8)),
+          storageUsage: Math.max(30, Math.min(95, prev.storageUsage + (Math.random() - 0.5) * 5)),
+          activeUsers: Math.max(1500, Math.min(2500, prev.activeUsers + Math.floor((Math.random() - 0.5) * 20))),
+          todayVisitors: prev.todayVisitors + Math.floor(Math.random() * 3)
+        }));
+      }, 3000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isAdminLoggedIn, showAdminPanel]);
+
+  // Add notification function
+  const addNotification = useCallback((type, message) => {
+    const newNotification = {
+      id: Date.now(),
+      type,
+      message,
+      time: 'Just now'
+    };
+    setNotifications(prev => [newNotification, ...prev.slice(0, 4)]);
+  }, []);
 
   // Enhanced Admin Panel with tabs and advanced features
   const AdminPanel = () => {
