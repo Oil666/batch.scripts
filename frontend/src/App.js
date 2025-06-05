@@ -552,7 +552,7 @@ const App = () => {
               id="admin-username"
               type="text"
               value={loginUsername}
-              onChange={(e) => setLoginUsername(e.target.value)}
+              onChange={(e) => handleUsernameChange(e.target.value)}
               placeholder="Enter admin username"
               required
               autoComplete="username"
@@ -568,7 +568,7 @@ const App = () => {
               id="admin-password"
               type="password"
               value={loginPassword}
-              onChange={(e) => setLoginPassword(e.target.value)}
+              onChange={(e) => handlePasswordChange(e.target.value)}
               placeholder="Enter admin password"
               required
               autoComplete="current-password"
