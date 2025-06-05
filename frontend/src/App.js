@@ -4,6 +4,15 @@ import './App.css';
 const App = () => {
   const [scrollY, setScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState('home');
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [adminCredentials, setAdminCredentials] = useState({ username: '', password: '' });
+  const [adminError, setAdminError] = useState('');
+
+  // Admin credentials (in a real app, this would be handled securely on the backend)
+  const ADMIN_USERNAME = 'admin';
+  const ADMIN_PASSWORD = 'pandamodz2024';
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -11,10 +20,39 @@ const App = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    // Check if admin is already logged in
+    const adminSession = localStorage.getItem('pandaAdminSession');
+    if (adminSession === 'true') {
+      setIsAdminLoggedIn(true);
+    }
+  }, []);
+
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     element.scrollIntoView({ behavior: 'smooth' });
     setActiveSection(sectionId);
+  };
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (adminCredentials.username === ADMIN_USERNAME && adminCredentials.password === ADMIN_PASSWORD) {
+      setIsAdminLoggedIn(true);
+      setShowAdminLogin(false);
+      setShowAdminPanel(true);
+      setAdminError('');
+      localStorage.setItem('pandaAdminSession', 'true');
+    } else {
+      setAdminError('Invalid credentials');
+      setAdminCredentials({ username: '', password: '' });
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminLoggedIn(false);
+    setShowAdminPanel(false);
+    setAdminCredentials({ username: '', password: '' });
+    localStorage.removeItem('pandaAdminSession');
   };
 
   const services = [
@@ -92,13 +130,161 @@ const App = () => {
     }
   ];
 
+  const AdminPanel = () => (
+    <div className="admin-panel-overlay">
+      <div className="admin-panel">
+        <div className="admin-header">
+          <h2>🛡️ PANDA_MODZ Admin Panel</h2>
+          <button className="admin-close" onClick={() => setShowAdminPanel(false)}>✕</button>
+        </div>
+        
+        <div className="admin-content">
+          <div className="admin-stats">
+            <div className="stat-card">
+              <h3>📺 Videos</h3>
+              <p>{videos.length} Active</p>
+            </div>
+            <div className="stat-card">
+              <h3>🎮 Services</h3>
+              <p>{services.length} Available</p>
+            </div>
+            <div className="stat-card">
+              <h3>🚀 Projects</h3>
+              <p>{showcaseItems.length} Featured</p>
+            </div>
+            <div className="stat-card">
+              <h3>👥 Status</h3>
+              <p>Online</p>
+            </div>
+          </div>
+
+          <div className="admin-sections">
+            <div className="admin-section">
+              <h3>📊 Website Analytics</h3>
+              <div className="analytics-grid">
+                <div className="analytics-item">
+                  <span className="analytics-label">Page Views</span>
+                  <span className="analytics-value">12,547</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">Unique Visitors</span>
+                  <span className="analytics-value">3,892</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">Discord Clicks</span>
+                  <span className="analytics-value">1,234</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">YouTube Views</span>
+                  <span className="analytics-value">8,765</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="admin-section">
+              <h3>🎬 Content Management</h3>
+              <div className="content-actions">
+                <button className="admin-btn">📝 Edit Homepage</button>
+                <button className="admin-btn">🎥 Manage Videos</button>
+                <button className="admin-btn">🎮 Update Services</button>
+                <button className="admin-btn">🚀 Edit Showcase</button>
+              </div>
+            </div>
+
+            <div className="admin-section">
+              <h3>🔗 Quick Links Management</h3>
+              <div className="links-grid">
+                <div className="link-item">
+                  <span>Discord:</span>
+                  <span className="link-url">discord.com/invite/sYT5UXkv7F</span>
+                </div>
+                <div className="link-item">
+                  <span>YouTube:</span>
+                  <span className="link-url">youtube.com/@DarkPandax</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="admin-section">
+              <h3>⚙️ System Actions</h3>
+              <div className="system-actions">
+                <button className="admin-btn success">💾 Backup Data</button>
+                <button className="admin-btn warning">🔄 Clear Cache</button>
+                <button className="admin-btn danger" onClick={handleAdminLogout}>🚪 Logout</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const AdminLogin = () => (
+    <div className="admin-login-overlay">
+      <div className="admin-login">
+        <div className="admin-login-header">
+          <h2>🔐 Admin Access</h2>
+          <button className="admin-close" onClick={() => setShowAdminLogin(false)}>✕</button>
+        </div>
+        
+        <form onSubmit={handleAdminLogin} className="admin-login-form">
+          <div className="form-group">
+            <label>Username:</label>
+            <input
+              type="text"
+              value={adminCredentials.username}
+              onChange={(e) => setAdminCredentials({...adminCredentials, username: e.target.value})}
+              placeholder="Enter admin username"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Password:</label>
+            <input
+              type="password"
+              value={adminCredentials.password}
+              onChange={(e) => setAdminCredentials({...adminCredentials, password: e.target.value})}
+              placeholder="Enter admin password"
+              required
+            />
+          </div>
+          
+          {adminError && <div className="admin-error">{adminError}</div>}
+          
+          <button type="submit" className="admin-login-btn">🚀 Access Admin Panel</button>
+        </form>
+        
+        <div className="admin-help">
+          <p>🔒 Authorized personnel only</p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="app">
+      {/* Admin Access Button */}
+      <button 
+        className="admin-access-btn" 
+        onClick={() => isAdminLoggedIn ? setShowAdminPanel(true) : setShowAdminLogin(true)}
+        title="Admin Access"
+      >
+        {isAdminLoggedIn ? '🛡️' : '🔐'}
+      </button>
+
+      {/* Admin Login Modal */}
+      {showAdminLogin && <AdminLogin />}
+      
+      {/* Admin Panel Modal */}
+      {showAdminPanel && <AdminPanel />}
+
       {/* Navigation */}
       <nav className="nav">
         <div className="nav-container">
           <div className="nav-brand">
             <span className="brand-text">𝓟𝓐𝓝𝓓𝓐_𝓜𝓞𝓓𝓩</span>
+            {isAdminLoggedIn && <span className="admin-indicator">🛡️ Admin</span>}
           </div>
           <div className="nav-links">
             <a href="#home" onClick={() => scrollToSection('home')} className={activeSection === 'home' ? 'active' : ''}>Home</a>
