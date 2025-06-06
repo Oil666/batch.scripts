@@ -3297,6 +3297,27 @@ body {
   box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
 }
 
+.logout-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+}
+
 .login-overlay {
   position: fixed;
   top: 0;
