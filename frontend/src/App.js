@@ -222,6 +222,11 @@ const App = () => {
             <a href="https://discord.com/invite/sYT5UXkv7F" target="_blank" rel="noopener noreferrer" className="discord-link">
               <span className="discord-icon">💬</span> Discord
             </a>
+            {isLoggedIn && (
+              <button onClick={handleLogout} className="logout-btn">
+                <span>🚪</span> Logout
+              </button>
+            )}
           </div>
         </div>
       </nav>
