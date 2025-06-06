@@ -208,9 +208,6 @@ const App = () => {
             <a href="https://www.youtube.com/@DarkPandax" target="_blank" rel="noopener noreferrer" className="youtube-link">
               <span className="youtube-icon">📺</span> YouTube
             </a>
-            <a href="https://discord.com/invite/sYT5UXkv7F" target="_blank" rel="noopener noreferrer" className="discord-link">
-              <span className="discord-icon">💬</span> Discord
-            </a>
             {!isLoggedIn ? (
               <button onClick={() => setShowLogin(true)} className="login-link">
                 <span>🔐</span> Login
@@ -220,6 +217,9 @@ const App = () => {
                 <span>🚪</span> Logout
               </button>
             )}
+            <a href="https://discord.com/invite/sYT5UXkv7F" target="_blank" rel="noopener noreferrer" className="discord-link">
+              <span className="discord-icon">💬</span> Discord
+            </a>
           </div>
         </div>
       </nav>
