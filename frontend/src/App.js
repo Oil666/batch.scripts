@@ -28,145 +28,38 @@ const App = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Security: Check for existing admin session
-  useEffect(() => {
-    const adminSession = localStorage.getItem('pandaAdminSession');
-    const sessionTime = localStorage.getItem('pandaSessionTime');
-    const currentTime = Date.now();
-    
-    if (adminSession === 'true' && sessionTime) {
-      const sessionAge = currentTime - parseInt(sessionTime);
-      if (sessionAge < SESSION_DURATION) {
-        setIsAdminLoggedIn(true);
-        const remainingTime = SESSION_DURATION - sessionAge;
-        setSessionExpiry(currentTime + remainingTime);
-        startSessionTimer(remainingTime);
-      } else {
-        handleSecureLogout();
-      }
-    }
-
-    const lockoutEnd = localStorage.getItem('pandaLockoutEnd');
-    if (lockoutEnd && currentTime < parseInt(lockoutEnd)) {
-      setIsLocked(true);
-      setLockoutTime(parseInt(lockoutEnd));
-      startLockoutTimer(parseInt(lockoutEnd) - currentTime);
-    }
-
-    const handleBeforeUnload = () => {
-      if (sessionTimeoutRef.current) {
-        clearTimeout(sessionTimeoutRef.current);
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      if (sessionTimeoutRef.current) {
-        clearTimeout(sessionTimeoutRef.current);
-      }
-      if (loginTimeoutRef.current) {
-        clearTimeout(loginTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Security functions
-  const startLockoutTimer = useCallback((duration) => {
-    if (loginTimeoutRef.current) {
-      clearTimeout(loginTimeoutRef.current);
-    }
-    
-    loginTimeoutRef.current = setTimeout(() => {
-      setIsLocked(false);
-      setLockoutTime(0);
-      setLoginAttempts(0);
-      localStorage.removeItem('pandaLockoutEnd');
-      localStorage.removeItem('pandaLoginAttempts');
-    }, duration);
-  }, []);
-
-  const startSessionTimer = useCallback((duration) => {
-    if (sessionTimeoutRef.current) {
-      clearTimeout(sessionTimeoutRef.current);
-    }
-    
-    sessionTimeoutRef.current = setTimeout(() => {
-      setShowSecurityWarning(true);
-      setTimeout(() => {
-        handleSecureLogout();
-        setShowSecurityWarning(false);
-      }, 30000);
-    }, duration - 30000);
-  }, []);
-
-  const handleSecureLogout = useCallback(() => {
-    setIsAdminLoggedIn(false);
-    setShowAdminPanel(false);
-    setShowAdminLogin(false);
-    setLoginUsername('');
-    setLoginPassword('');
-    setSessionExpiry(null);
-    
-    localStorage.removeItem('pandaAdminSession');
-    localStorage.removeItem('pandaSessionTime');
-    
-    if (sessionTimeoutRef.current) {
-      clearTimeout(sessionTimeoutRef.current);
-    }
-  }, []);
-
-  const handleAdminLogin = useCallback((e) => {
+  // Simple login handler
+  const handleLogin = useCallback((e) => {
     e.preventDefault();
     
-    if (isLocked) {
-      const remainingTime = Math.ceil((lockoutTime - Date.now()) / 1000 / 60);
-      setLoginError(`Account locked. Try again in ${remainingTime} minutes.`);
-      return;
-    }
-
-    if (loginUsername.trim() === ADMIN_USER && loginPassword.trim() === ADMIN_PASS) {
-      const currentTime = Date.now();
-      const expiryTime = currentTime + SESSION_DURATION;
-      
-      setIsAdminLoggedIn(true);
-      setShowAdminLogin(false);
-      setShowAdminPanel(true);
+    if (loginUsername.trim() === LOGIN_USER && loginPassword.trim() === LOGIN_PASS) {
+      setIsLoggedIn(true);
+      setShowLogin(false);
       setLoginError('');
-      setLoginAttempts(0);
-      setSessionExpiry(expiryTime);
-      
-      localStorage.setItem('pandaAdminSession', 'true');
-      localStorage.setItem('pandaSessionTime', currentTime.toString());
-      localStorage.removeItem('pandaLoginAttempts');
-      localStorage.removeItem('pandaLockoutEnd');
-      
-      startSessionTimer(SESSION_DURATION);
-      
       setLoginUsername('');
       setLoginPassword('');
       
+      // Store login state
+      localStorage.setItem('pandaLoggedIn', 'true');
     } else {
-      const newAttempts = loginAttempts + 1;
-      setLoginAttempts(newAttempts);
-      localStorage.setItem('pandaLoginAttempts', newAttempts.toString());
-      
-      if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
-        const lockoutEnd = Date.now() + LOCKOUT_DURATION;
-        setIsLocked(true);
-        setLockoutTime(lockoutEnd);
-        localStorage.setItem('pandaLockoutEnd', lockoutEnd.toString());
-        startLockoutTimer(LOCKOUT_DURATION);
-        
-        setLoginError(`Too many failed attempts. Account locked for 5 minutes.`);
-      } else {
-        const remaining = MAX_LOGIN_ATTEMPTS - newAttempts;
-        setLoginError(`Invalid credentials. ${remaining} attempts remaining.`);
-      }
-      
+      setLoginError('Invalid username or password');
       setLoginPassword('');
     }
-  }, [loginUsername, loginPassword, isLocked, lockoutTime, loginAttempts, startSessionTimer, startLockoutTimer]);
+  }, [loginUsername, loginPassword]);
+
+  // Simple logout handler
+  const handleLogout = useCallback(() => {
+    setIsLoggedIn(false);
+    localStorage.removeItem('pandaLoggedIn');
+  }, []);
+
+  // Check for existing login on page load
+  useEffect(() => {
+    const loggedIn = localStorage.getItem('pandaLoggedIn');
+    if (loggedIn === 'true') {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   // Services data
   const services = [
