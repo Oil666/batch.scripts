@@ -137,345 +137,55 @@ const App = () => {
     }
   ];
 
-  // Admin Panel Component
-  const AdminPanel = () => {
-    const renderTabContent = () => {
-      switch(activeAdminTab) {
-        case 'dashboard':
-          return (
-            <div className="admin-dashboard">
-              <div className="metrics-row">
-                <div className="metric-card primary">
-                  <div className="metric-icon">👥</div>
-                  <div className="metric-content">
-                    <h3>{adminData.totalVisitors.toLocaleString()}</h3>
-                    <p>Total Visitors</p>
-                    <span className="metric-change positive">+12.5%</span>
-                  </div>
-                </div>
-                <div className="metric-card success">
-                  <div className="metric-icon">⬇️</div>
-                  <div className="metric-content">
-                    <h3>{adminData.totalDownloads.toLocaleString()}</h3>
-                    <p>Total Downloads</p>
-                    <span className="metric-change positive">+8.3%</span>
-                  </div>
-                </div>
-                <div className="metric-card warning">
-                  <div className="metric-icon">🟢</div>
-                  <div className="metric-content">
-                    <h3>{adminData.activeUsers.toLocaleString()}</h3>
-                    <p>Active Users</p>
-                    <span className="metric-change positive">+15.7%</span>
-                  </div>
-                </div>
-                <div className="metric-card info">
-                  <div className="metric-icon">📊</div>
-                  <div className="metric-content">
-                    <h3>{adminData.todayVisitors}</h3>
-                    <p>Today's Visitors</p>
-                    <span className="metric-change positive">+23.1%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        
-        case 'content':
-          return (
-            <div className="admin-content-manager">
-              <div className="content-header">
-                <h3>📝 Content Management</h3>
-                <button className="add-content-btn">+ Add New Content</button>
-              </div>
-              
-              <div className="content-sections">
-                <div className="content-section">
-                  <h4>🎥 Video Management</h4>
-                  <div className="content-items">
-                    {videos.map((video, index) => (
-                      <div key={index} className="content-item-card">
-                        <div className="content-thumb">
-                          <img src={`https://img.youtube.com/vi/${video.id}/mqdefault.jpg`} alt={video.title} />
-                        </div>
-                        <div className="content-details">
-                          <h5>{video.title}</h5>
-                          <p>{video.description}</p>
-                          <div className="content-actions">
-                            <button className="edit-btn">✏️ Edit</button>
-                            <button className="delete-btn">🗑️ Delete</button>
-                            <button className="analytics-btn">📊 Analytics</button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-
-        case 'analytics':
-          return (
-            <div className="admin-analytics">
-              <div className="analytics-header">
-                <h3>📊 Advanced Analytics</h3>
-              </div>
-              <div className="analytics-grid">
-                <div className="analytics-card">
-                  <h4>🌍 Geographic Distribution</h4>
-                  <div className="geo-stats">
-                    <div className="geo-item">
-                      <span className="country">🇺🇸 United States</span>
-                      <div className="geo-bar">
-                        <div className="geo-fill" style={{width: '65%'}}></div>
-                      </div>
-                      <span>65%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-
-        case 'security':
-          return (
-            <div className="admin-security">
-              <div className="security-header">
-                <h3>🔒 Security Center</h3>
-                <div className="security-status online">🟢 All Systems Secure</div>
-              </div>
-              <div className="security-sections">
-                <div className="security-section">
-                  <h4>🛡️ Security Overview</h4>
-                  <div className="security-metrics">
-                    <div className="security-metric">
-                      <span className="security-icon">🔑</span>
-                      <div className="security-info">
-                        <h5>Login Attempts</h5>
-                        <p>{loginAttempts}/3 failed attempts</p>
-                      </div>
-                      <div className="security-status-indicator success"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-
-        case 'system':
-          return (
-            <div className="admin-system">
-              <div className="system-header">
-                <h3>⚙️ System Management</h3>
-                <div className="system-status online">🟢 All Systems Operational</div>
-              </div>
-              <div className="system-sections">
-                <div className="system-section">
-                  <h4>📊 System Resources</h4>
-                  <div className="resource-monitors">
-                    <div className="resource-monitor">
-                      <div className="resource-header">
-                        <span className="resource-icon">🖥️</span>
-                        <h5>CPU Usage</h5>
-                        <span className="resource-value">{adminData.cpuUsage}%</span>
-                      </div>
-                      <div className="resource-bar">
-                        <div className="resource-fill cpu" style={{width: `${adminData.cpuUsage}%`}}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-
-        default:
-          return <div>Loading...</div>;
-      }
-    };
-
-    return (
-      <div className="admin-panel-overlay" onClick={(e) => e.target === e.currentTarget && setShowAdminPanel(false)}>
-        <div className="admin-panel advanced">
-          <div className="admin-header advanced">
-            <div className="admin-brand">
-              <h2>🛡️ PANDA_MODZ Admin Console</h2>
-              <span className="admin-version">v2.1.0</span>
-            </div>
-            <div className="admin-header-controls">
-              <div className="session-info">
-                <span className="session-status">🟢 Active</span>
-                <span className="session-time">
-                  {sessionExpiry ? Math.floor((sessionExpiry - Date.now()) / 1000 / 60) : 30}m left
-                </span>
-              </div>
-              <button className="admin-close" onClick={() => setShowAdminPanel(false)}>✕</button>
-            </div>
-          </div>
-          
-          <div className="admin-navigation">
-            <button 
-              className={`nav-tab ${activeAdminTab === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setActiveAdminTab('dashboard')}
-            >
-              <span className="tab-icon">📊</span>
-              <span className="tab-label">Dashboard</span>
-            </button>
-            <button 
-              className={`nav-tab ${activeAdminTab === 'content' ? 'active' : ''}`}
-              onClick={() => setActiveAdminTab('content')}
-            >
-              <span className="tab-icon">📝</span>
-              <span className="tab-label">Content</span>
-            </button>
-            <button 
-              className={`nav-tab ${activeAdminTab === 'analytics' ? 'active' : ''}`}
-              onClick={() => setActiveAdminTab('analytics')}
-            >
-              <span className="tab-icon">📈</span>
-              <span className="tab-label">Analytics</span>
-            </button>
-            <button 
-              className={`nav-tab ${activeAdminTab === 'security' ? 'active' : ''}`}
-              onClick={() => setActiveAdminTab('security')}
-            >
-              <span className="tab-icon">🔒</span>
-              <span className="tab-label">Security</span>
-            </button>
-            <button 
-              className={`nav-tab ${activeAdminTab === 'system' ? 'active' : ''}`}
-              onClick={() => setActiveAdminTab('system')}
-            >
-              <span className="tab-icon">⚙️</span>
-              <span className="tab-label">System</span>
-            </button>
-            <button 
-              className="nav-tab logout"
-              onClick={handleSecureLogout}
-            >
-              <span className="tab-icon">🚪</span>
-              <span className="tab-label">Logout</span>
-            </button>
-          </div>
-
-          <div className="admin-content advanced">
-            {renderTabContent()}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Admin Login Component (Memoized for stability)
-  const AdminLogin = React.memo(() => (
-    <div className="admin-login-overlay ultra-stable" onClick={(e) => {
+  // Simple Login Component
+  const LoginModal = () => (
+    <div className="login-overlay" onClick={(e) => {
       if (e.target === e.currentTarget) {
-        setShowAdminLogin(false);
+        setShowLogin(false);
       }
     }}>
-      <div className="admin-login ultra-stable" onClick={(e) => e.stopPropagation()}>
-        <div className="admin-login-header ultra-stable">
-          <h2>🔐 Secure Admin Access</h2>
-          <button className="admin-close ultra-stable" onClick={() => setShowAdminLogin(false)}>✕</button>
+      <div className="login-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="login-header">
+          <h2>🔐 Login</h2>
+          <button className="login-close" onClick={() => setShowLogin(false)}>✕</button>
         </div>
         
-        <form onSubmit={handleAdminLogin} className="admin-login-form ultra-stable">
-          <div className="admin-credentials-display ultra-stable">
-            <p><strong>Demo Credentials:</strong></p>
-            <p>Username: admin</p>
-            <p>Password: pandamodz2024</p>
-          </div>
-          
-          <div className="form-group ultra-stable">
-            <label htmlFor="admin-username">Username:</label>
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="form-group">
+            <label htmlFor="username">Username:</label>
             <input
-              id="admin-username"
+              id="username"
               type="text"
               value={loginUsername}
-              onChange={(e) => handleUsernameChange(e.target.value)}
-              placeholder="Enter admin username"
+              onChange={(e) => setLoginUsername(e.target.value)}
+              placeholder="Enter username"
               required
               autoComplete="username"
-              maxLength="50"
-              disabled={isLocked}
-              className="ultra-stable-input"
             />
           </div>
           
-          <div className="form-group ultra-stable">
-            <label htmlFor="admin-password">Password:</label>
+          <div className="form-group">
+            <label htmlFor="password">Password:</label>
             <input
-              id="admin-password"
+              id="password"
               type="password"
               value={loginPassword}
-              onChange={(e) => handlePasswordChange(e.target.value)}
-              placeholder="Enter admin password"
+              onChange={(e) => setLoginPassword(e.target.value)}
+              placeholder="Enter password"
               required
               autoComplete="current-password"
-              maxLength="50"
-              disabled={isLocked}
-              className="ultra-stable-input"
             />
           </div>
 
-          {isLocked && (
-            <div className="lockout-warning ultra-stable">
-              🔒 Account temporarily locked. Time remaining: {Math.ceil((lockoutTime - Date.now()) / 1000 / 60)} minutes
-            </div>
-          )}
+          {loginError && <div className="login-error">{loginError}</div>}
           
-          {loginError && <div className="admin-error ultra-stable">{loginError}</div>}
-          
-          <button type="submit" className="admin-login-btn ultra-stable" disabled={isLocked}>
-            🚀 Secure Login
+          <button type="submit" className="login-btn">
+            🚀 Login
           </button>
-          
-          <div className="quick-login ultra-stable">
-            <button 
-              type="button" 
-              className="quick-login-btn ultra-stable"
-              onClick={() => {
-                setLoginUsername('admin');
-                setLoginPassword('pandamodz2024');
-              }}
-              disabled={isLocked}
-            >
-              🔑 Quick Fill Demo Credentials
-            </button>
-            
-            <button 
-              type="button" 
-              className="instant-login-btn ultra-stable"
-              onClick={() => {
-                if (!isLocked) {
-                  const currentTime = Date.now();
-                  const expiryTime = currentTime + SESSION_DURATION;
-                  
-                  setIsAdminLoggedIn(true);
-                  setShowAdminLogin(false);
-                  setShowAdminPanel(true);
-                  setLoginError('');
-                  setSessionExpiry(expiryTime);
-                  
-                  localStorage.setItem('pandaAdminSession', 'true');
-                  localStorage.setItem('pandaSessionTime', currentTime.toString());
-                  startSessionTimer(SESSION_DURATION);
-                }
-              }}
-              disabled={isLocked}
-            >
-              ⚡ Demo Access (Bypass Login)
-            </button>
-          </div>
         </form>
-        
-        <div className="admin-help ultra-stable">
-          <p>🔒 Secured with enterprise-grade protection</p>
-        </div>
       </div>
     </div>
-  ));
+  );
 
   return (
     <div className="app">
