@@ -5,68 +5,16 @@ const App = () => {
   const [scrollY, setScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState('home');
   
-  // Enhanced Admin Security State
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  // Simplified Login State
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [loginAttempts, setLoginAttempts] = useState(0);
-  const [isLocked, setIsLocked] = useState(false);
-  const [lockoutTime, setLockoutTime] = useState(0);
-  const [sessionExpiry, setSessionExpiry] = useState(null);
-  const [showSecurityWarning, setShowSecurityWarning] = useState(false);
   
-  // Enhanced Admin Panel State
-  const [activeAdminTab, setActiveAdminTab] = useState('dashboard');
-  const [adminData, setAdminData] = useState({
-    totalVisitors: 15847,
-    todayVisitors: 324,
-    totalDownloads: 89452,
-    activeUsers: 1847,
-    serverStatus: 'online',
-    cpuUsage: 34,
-    memoryUsage: 67,
-    storageUsage: 45,
-    uptime: '7d 14h 23m',
-    lastBackup: '2 hours ago',
-    version: 'v2.1.0'
-  });
-
-  // Security refs
-  const loginTimeoutRef = useRef(null);
-  const sessionTimeoutRef = useRef(null);
-  
-  // Debounce refs for input stability
-  const usernameDebounceRef = useRef(null);
-  const passwordDebounceRef = useRef(null);
-
-  // Security constants
-  const ADMIN_USER = 'admin';
-  const ADMIN_PASS = 'pandamodz2024';
-  const MAX_LOGIN_ATTEMPTS = 3;
-  const LOCKOUT_DURATION = 300000; // 5 minutes
-  const SESSION_DURATION = 1800000; // 30 minutes
-  
-  // Debounced input handlers for ultra stability
-  const handleUsernameChange = useCallback((value) => {
-    if (usernameDebounceRef.current) {
-      clearTimeout(usernameDebounceRef.current);
-    }
-    usernameDebounceRef.current = setTimeout(() => {
-      setLoginUsername(value);
-    }, 0); // Immediate but debounced
-  }, []);
-  
-  const handlePasswordChange = useCallback((value) => {
-    if (passwordDebounceRef.current) {
-      clearTimeout(passwordDebounceRef.current);
-    }
-    passwordDebounceRef.current = setTimeout(() => {
-      setLoginPassword(value);
-    }, 0); // Immediate but debounced
-  }, []);
+  // Login credentials
+  const LOGIN_USER = 'admin';
+  const LOGIN_PASS = 'pandamodz2024';
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
