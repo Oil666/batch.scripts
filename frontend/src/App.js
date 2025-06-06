@@ -189,17 +189,6 @@ const App = () => {
 
   return (
     <div className="app">
-      {/* Login Button */}
-      {!isLoggedIn && (
-        <button 
-          className="login-btn-float" 
-          onClick={() => setShowLogin(true)}
-          title="Login"
-        >
-          🔐
-        </button>
-      )}
-
       {/* Login Modal */}
       {showLogin && <LoginModal />}
 
