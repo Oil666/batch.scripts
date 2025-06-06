@@ -3442,6 +3442,7 @@ body {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
+  font-weight: 600;
   text-decoration: none;
 }
 
