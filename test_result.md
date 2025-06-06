@@ -156,6 +156,9 @@ frontend:
       - working: true
         agent: "main"
         comment: "Completely replaced complex admin panel system with simple, clean login functionality. Removed enterprise security features, admin panel tabs, session management, and lockout systems. Implemented basic username/password validation with clean modal design. Added floating login button, user indicator in navigation, and logout functionality. Maintained same credentials (admin/pandamodz2024) for simplicity."
+      - working: true
+        agent: "main"
+        comment: "Moved login functionality from floating button to navigation bar next to Discord link. Login/Logout now appears as clean navigation buttons with proper styling matching the existing YouTube and Discord links. Maintains simple authentication flow with improved UX integration."
 
   - task: "Security Enhancement System"
     implemented: true
