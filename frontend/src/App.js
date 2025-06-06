@@ -208,7 +208,7 @@ const App = () => {
         <div className="nav-container">
           <div className="nav-brand">
             <span className="brand-text">𝓟𝓐𝓝𝓓𝓐_𝓜𝓞𝓓𝓩</span>
-            {isAdminLoggedIn && <span className="admin-indicator">🛡️ Admin</span>}
+            {isLoggedIn && <span className="user-indicator">👤 User</span>}
           </div>
           <div className="nav-links">
             <a href="#home" onClick={() => scrollToSection('home')} className={activeSection === 'home' ? 'active' : ''}>Home</a>
