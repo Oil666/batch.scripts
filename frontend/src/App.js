@@ -189,31 +189,19 @@ const App = () => {
 
   return (
     <div className="app">
-      {/* Security Warning */}
-      {showSecurityWarning && (
-        <div className="security-warning">
-          <div className="security-warning-content">
-            <h3>🔒 Security Notice</h3>
-            <p>Your admin session will expire in 30 seconds due to inactivity.</p>
-            <button onClick={() => setShowSecurityWarning(false)}>Continue Session</button>
-          </div>
-        </div>
+      {/* Login Button */}
+      {!isLoggedIn && (
+        <button 
+          className="login-btn-float" 
+          onClick={() => setShowLogin(true)}
+          title="Login"
+        >
+          🔐
+        </button>
       )}
 
-      {/* Admin Access Button */}
-      <button 
-        className="admin-access-btn" 
-        onClick={() => isAdminLoggedIn ? setShowAdminPanel(true) : setShowAdminLogin(true)}
-        title={isAdminLoggedIn ? "Admin Panel" : "Admin Login"}
-      >
-        {isAdminLoggedIn ? '🛡️' : (isLocked ? '🔒' : '🔐')}
-      </button>
-
-      {/* Admin Login Modal */}
-      {showAdminLogin && <AdminLogin />}
-      
-      {/* Admin Panel Modal */}
-      {showAdminPanel && <AdminPanel />}
+      {/* Login Modal */}
+      {showLogin && <LoginModal />}
 
       {/* Navigation */}
       <nav className="nav">
